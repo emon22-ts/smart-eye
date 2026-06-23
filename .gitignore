@@ -4,9 +4,6 @@ dataset.zip
 *.zip
 
 # ---- Trained models (>100MB, exceed GitHub's file limit) ----
-smart_eye/models/*.h5
-smart_eye/models/*.keras
-smart_eye/models/*.weights.h5
 smart_eye/models/hybrid_cnn_extracted/
 
 # ---- Database (contains session data; regenerated at runtime) ----
