@@ -16,6 +16,7 @@ Smart Eye is a multi-modal preliminary vision-screening and triage-support web a
 | **Ocular Health Index** | A single 0–100 score fusing CNN confidence, fatigue, and symptom burden through a transparent Mamdani fuzzy engine. |
 | **Triage recommendations** | Rule-based next-step guidance derived from the OHI band. |
 | **Session history + PDF export** | Every screening is persisted locally; sessions are reviewable, trend-charted, CSV-exportable, and downloadable as a PDF report. |
+| **Mobile responsive** | Adaptive layout with a hamburger navigation menu on small screens. |
 | **Privacy-first** | Face detection runs on-device; no cloud image storage. |
 
 ---
