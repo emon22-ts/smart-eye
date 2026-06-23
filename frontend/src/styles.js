@@ -234,6 +234,26 @@ export const STYLES = `
 
 /* Responsive nav */
 @media(max-width:760px){.nav-links{margin-left:14px;gap:0}.nav-links a{padding:8px 9px;font-size:12.5px}.brand .tag{display:none}}
+/* ---- Hamburger menu (mobile nav) ---- */
+.nav-burger{display:none;background:none;border:0;cursor:pointer;padding:10px;margin-left:auto}
+.burger-bars,.burger-bars::before,.burger-bars::after{display:block;width:22px;height:2px;background:var(--fg);border-radius:2px;transition:transform .2s,opacity .2s;content:""}
+.burger-bars{position:relative}
+.burger-bars::before{position:absolute;top:-7px}
+.burger-bars::after{position:absolute;top:7px}
+.burger-bars.open{background:transparent}
+.burger-bars.open::before{transform:translateY(7px) rotate(45deg)}
+.burger-bars.open::after{transform:translateY(-7px) rotate(-45deg)}
+.nav-mobile{display:none}
+@media(max-width:760px){
+  .nav-burger{display:block}
+  .nav-links,.nav-status{display:none}
+  .nav-mobile{display:flex;flex-direction:column;gap:2px;padding:10px 16px 16px;border-top:1px solid var(--border);background:rgba(6,10,18,.96);backdrop-filter:blur(16px)}
+  .nav-mobile a{font-size:15px;font-weight:500;color:var(--muted);text-decoration:none;padding:13px 12px;border-radius:10px}
+  .nav-mobile a.active{color:#fff;background:rgba(59,130,246,.14)}
+  .nav-mobile-foot{display:flex;align-items:center;gap:12px;margin-top:8px;padding:12px 12px 0;border-top:1px solid var(--border)}
+}
+.theme-light .nav-mobile{background:rgba(255,255,255,.97)}
+.theme-light .nav-mobile a.active{background:rgba(59,130,246,.12);color:var(--primary)}
 
 /* Print / export report */
 @media print{

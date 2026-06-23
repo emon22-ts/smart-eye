@@ -523,11 +523,13 @@ export function AuthModal({ open, onClose }) {
 export function NavBar({ isMock, theme, onToggleTheme }) {
   const { user } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = () => setMenuOpen(false);
   return (
     <nav className="se-nav">
       <style>{`.se-signin{padding:8px 17px;border:0;border-radius:10px;background:linear-gradient(135deg,#3B82F6,#06B6D4);color:#fff;font:700 13px/1 'Sora',sans-serif;letter-spacing:.2px;cursor:pointer;transition:transform .12s,box-shadow .12s,filter .12s;box-shadow:0 6px 16px rgba(59,130,246,.32);white-space:nowrap}.se-signin:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 9px 20px rgba(59,130,246,.42)}`}</style>
       <div className="se-wrap nav-in">
-        <NavLink to="/" className="brand">
+        <NavLink to="/" className="brand" onClick={closeMenu}>
           <div className="logo"><EyeLogo /></div>
           <div><b>SMART EYE</b><span className="tag">Clinical Intelligence</span></div>
         </NavLink>
@@ -546,7 +548,35 @@ export function NavBar({ isMock, theme, onToggleTheme }) {
           {!user && <button className="se-signin" onClick={() => setAuthOpen(true)}>Sign in</button>}
           <UserMenu onSignIn={() => setAuthOpen(true)} />
         </div>
+        <button
+          className="nav-burger"
+          aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((o) => !o)}
+        >
+          <span className={`burger-bars${menuOpen ? " open" : ""}`} />
+        </button>
       </div>
+
+      {menuOpen && (
+        <div className="nav-mobile">
+          <NavLink to="/" end onClick={closeMenu}>Home</NavLink>
+          <NavLink to="/screening" onClick={closeMenu}>Screening</NavLink>
+          <NavLink to="/fatigue" onClick={closeMenu}>Fatigue</NavLink>
+          <NavLink to="/history" onClick={closeMenu}>History</NavLink>
+          <div className="nav-mobile-foot">
+            <span className={`pill pill-sm ${isMock ? "pill-warn" : "pill-ok"}`}>
+              <span className="dot" />{isMock ? "Mock" : "Live"}
+            </span>
+            {!user && (
+              <button className="se-signin" onClick={() => { setAuthOpen(true); closeMenu(); }}>
+                Sign in
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
     </nav>
   );
