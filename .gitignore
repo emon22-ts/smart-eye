@@ -1,0 +1,38 @@
+# ---- Datasets (large, not ours to redistribute) ----
+dataset/
+dataset.zip
+*.zip
+
+# ---- Trained models (>100MB, exceed GitHub's file limit) ----
+smart_eye/models/*.h5
+smart_eye/models/*.keras
+smart_eye/models/*.weights.h5
+smart_eye/models/hybrid_cnn_extracted/
+
+# ---- Database (contains session data; regenerated at runtime) ----
+smart_eye/persistence/*.db
+*.db
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+*.log
+
+# ---- Node / frontend ----
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+node_modules/
+
+# ---- OS / editor ----
+.DS_Store
+.vscode/
+.idea/
+
+# ---- Runtime artifacts ----
+/tmp/
+*.tmp

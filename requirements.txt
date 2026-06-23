@@ -1,0 +1,35 @@
+# Smart Eye — backend + training dependencies
+# Apple Silicon (macOS arm64), Python 3.9/3.10.  Install inside a venv.
+#
+# Pinned around TensorFlow 2.13, which caps numpy at 1.24.3 and typing-extensions
+# below 4.6 — which rules out Pydantic v2 (needs >=4.6.1). Hence Pydantic v1.
+# These exact pins stop pip's resolver from backtracking into that conflict.
+
+# --- pins that resolve the TF 2.13 <-> Pydantic/typing-extensions clash ---
+numpy==1.24.3
+typing-extensions==4.5.0
+pydantic>=1.10,<2
+
+# --- API ---
+fastapi==0.100.0
+uvicorn[standard]==0.29.0
+python-multipart>=0.0.9
+pillow>=10.0
+
+# --- Fuzzy engine (optional; the bundled engine is pure-numpy) ---
+scikit-fuzzy==0.4.2
+
+# --- Deep learning: training (train_hybrid.py) AND serving the trained .h5 ---
+# On Apple Silicon, `tensorflow` resolves to the tensorflow-macos wheel automatically.
+tensorflow==2.13.0
+# Optional GPU acceleration on Apple Silicon — install a tensorflow-metal build
+# matching TF 2.13 if you want Metal:
+#   pip install tensorflow-metal
+
+# --- Tests ---
+pytest>=7.4
+
+# NOTE: dlib and opencv-python are intentionally absent. The live fatigue loop
+# extracts 68 landmarks in the browser (face-api.js) and POSTs only the
+# coordinates, so the server needs neither. Add them by hand only if you build a
+# server-side landmark detector.
