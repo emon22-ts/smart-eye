@@ -112,7 +112,7 @@ async def screen_image(file: UploadFile = File(...)) -> JSONResponse:
 
 
 @app.post("/api/screen/image/explain")
-async def screen_image_explain(file: UploadFile = File(...)) -> JSONResponse:
+async def screen_image_explain(file: UploadFile = File(...), class_name: Optional[str] = None) -> JSONResponse:
     """Classify an image AND return a Grad-CAM heatmap overlay (base64 PNG data URI).
     Grad-CAM is only meaningful with the real CNN; the overlay is null if mock or on error."""
     raw = await file.read()
@@ -124,12 +124,20 @@ async def screen_image_explain(file: UploadFile = File(...)) -> JSONResponse:
     prediction = _MODEL.predict(image)
     out = prediction.dict()
 
+    from ..config import DISEASE_CLASSES
+    class_idx = None
+    explained_class = None
+    if class_name and class_name in DISEASE_CLASSES:
+        class_idx = list(DISEASE_CLASSES).index(class_name)
+        explained_class = class_name
     from ..domain.gradcam import explain_image
     import numpy as np
     try:
-        out["gradcam"] = explain_image(_MODEL, np.asarray(image))
+        out["gradcam"] = explain_image(_MODEL, np.asarray(image), class_idx)
+        out["gradcam_class"] = explained_class or out.get("top_class")
     except Exception:
         out["gradcam"] = None
+        out["gradcam_class"] = None
     return JSONResponse(out)
 
 
