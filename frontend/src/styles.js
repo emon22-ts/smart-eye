@@ -73,6 +73,19 @@ export const STYLES = `
 .fundus-warn p{font-size:12.5px;color:#fca5a5;line-height:1.5;font-weight:500}
 .fundus-ack{display:flex;align-items:center;gap:9px;margin-top:10px;cursor:pointer;font-size:12.5px;color:var(--muted)}
 .fundus-ack input{width:16px;height:16px;cursor:pointer;accent-color:var(--primary)}
+.batch-card{margin-top:18px}
+.batch-controls{display:flex;gap:10px;flex-wrap:wrap}
+.batch-controls .btn{flex:1;min-width:160px}
+.batch-table{margin-top:16px;display:flex;flex-direction:column}
+.batch-head,.batch-row{display:grid;grid-template-columns:2fr .7fr 1fr 1.6fr .7fr;gap:12px;align-items:center;padding:9px 12px}
+.batch-head{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted-2);border-bottom:1px solid var(--border)}
+.batch-row{border-bottom:1px solid rgba(30,42,68,.4);font-size:13px}
+.batch-row:last-child{border-bottom:none}
+.batch-file{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--muted)}
+.batch-band{text-transform:capitalize}
+.batch-top{text-transform:capitalize;display:flex;align-items:center;gap:6px}
+.batch-err{color:var(--danger);font-size:12px}
+@media(max-width:680px){.batch-head{display:none}.batch-row{grid-template-columns:1fr 1fr;gap:6px 12px}}
 .err-strip{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;padding:9px 16px;border-radius:10px;font-size:13px;margin-bottom:10px}
 .disc-in{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:14px 18px;display:flex;gap:14px;align-items:flex-start;margin-bottom:18px}
 .disc-in .ic{width:30px;height:30px;border-radius:9px;background:rgba(245,158,11,.14);display:grid;place-items:center;flex-shrink:0}

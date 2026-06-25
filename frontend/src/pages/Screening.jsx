@@ -3,7 +3,7 @@
 // client-side print/export. Each scored session is persisted to History server-side.
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { scoreSession, explainImage } from "../api";
-import { SYMPTOMS, DISCLAIMER } from "../constants";
+import { SYMPTOMS, DISCLAIMER, COLOURS } from "../constants";
 import { Banners, Dropzone, LikertRow, OHIGauge, ClassBars, WebcamCapture } from "../components";
 
 // Lightweight client-side guard: does this image plausibly look like a retinal
@@ -46,6 +46,94 @@ async function looksLikeFundus(file) {
   } finally {
     URL.revokeObjectURL(url);
   }
+}
+
+// Batch screening: score several fundus images in one go. Each image is scored on
+// the image alone (symptoms neutral) via the existing endpoint and saved to history.
+// Runs sequentially to stay gentle on the model; no backend change is required.
+function BatchScreen() {
+  const [files, setFiles] = useState([]);
+  const [results, setResults] = useState([]);
+  const [running, setRunning] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const inputRef = useRef(null);
+
+  const pick = (e) => {
+    const list = Array.from(e.target.files || []).filter((f) => f.type.startsWith("image/"));
+    setFiles(list);
+    setResults([]);
+  };
+
+  const runAll = async () => {
+    if (!files.length) return;
+    setRunning(true);
+    setResults([]);
+    setProgress(0);
+    const out = [];
+    const neutral = { pain: 1, redness: 1, photophobia: 1, blurred_vision: 1 };
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i];
+      try {
+        const r = await scoreSession({ file: f, symptoms: neutral, fatigue: null });
+        out.push({
+          name: f.name,
+          ohi: r.ohi?.ohi,
+          band: r.ohi?.band,
+          colour: r.ohi?.colour,
+          top: (r.disease?.top_class || "—").replace(/_/g, " "),
+          conf: r.disease?.probabilities ? Math.max(...Object.values(r.disease.probabilities)) : null,
+          mock: !!r.disease?.is_mock,
+        });
+      } catch (e) {
+        out.push({ name: f.name, error: e.message });
+      }
+      setProgress(i + 1);
+      setResults([...out]);
+    }
+    setRunning(false);
+  };
+
+  return (
+    <section className="card batch-card">
+      <div className="card-head"><span className="eyebrow">Batch</span><h3>Batch screening</h3></div>
+      <p className="muted small" style={{ marginBottom: 14 }}>
+        Screen several fundus images at once. Each is scored on the image alone (symptoms neutral) and saved to history.
+      </p>
+      <input ref={inputRef} type="file" accept="image/*" multiple style={{ display: "none" }} onChange={pick} />
+      <div className="batch-controls">
+        <button type="button" className="btn btn-ghost" onClick={() => inputRef.current?.click()} disabled={running}>
+          {files.length ? `${files.length} image${files.length > 1 ? "s" : ""} selected` : "Select fundus images"}
+        </button>
+        <button type="button" className="btn btn-primary" onClick={runAll} disabled={running || !files.length}>
+          {running ? `Screening ${progress}/${files.length}…` : "Screen all"}
+        </button>
+      </div>
+      {results.length > 0 && (
+        <div className="batch-table">
+          <div className="batch-head">
+            <span>File</span><span>OHI</span><span>Risk</span><span>Top finding</span><span>Conf.</span>
+          </div>
+          {results.map((r, i) => (
+            <div className="batch-row" key={i}>
+              <span className="batch-file" title={r.name}>{r.name}</span>
+              {r.error ? (
+                <span className="batch-err" style={{ gridColumn: "2 / 6" }}>Failed: {r.error}</span>
+              ) : (
+                <>
+                  <span className="mono" style={{ color: COLOURS[r.colour] || "var(--fg)" }}>
+                    {r.ohi == null ? "—" : Math.round(r.ohi)}
+                  </span>
+                  <span className="batch-band">{r.band || "—"}</span>
+                  <span className="batch-top">{r.top}{r.mock && <span className="mock-tag">mock</span>}</span>
+                  <span className="mono small">{r.conf == null ? "—" : `${(r.conf * 100).toFixed(0)}%`}</span>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  );
 }
 
 export default function Screening({ isMock }) {
@@ -206,6 +294,8 @@ export default function Screening({ isMock }) {
           )}
         </section>
       </div>
+
+      <BatchScreen />
     </main>
   );
 }
