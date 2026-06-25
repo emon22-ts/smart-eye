@@ -86,6 +86,11 @@ export const STYLES = `
 .batch-top{text-transform:capitalize;display:flex;align-items:center;gap:6px}
 .batch-err{color:var(--danger);font-size:12px}
 @media(max-width:680px){.batch-head{display:none}.batch-row{grid-template-columns:1fr 1fr;gap:6px 12px}}
+.gradcam-classes{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.gc-class{font-family:inherit;font-size:11.5px;font-weight:500;padding:6px 11px;border-radius:8px;border:1px solid var(--border-2);background:var(--card-2);color:var(--muted);cursor:pointer;transition:.15s;text-transform:capitalize}
+.gc-class:hover:not(:disabled){color:var(--fg);border-color:var(--primary)}
+.gc-class.on{background:rgba(59,130,246,.14);color:#fff;border-color:var(--primary)}
+.gc-class:disabled{opacity:.5;cursor:default}
 .err-strip{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5;padding:9px 16px;border-radius:10px;font-size:13px;margin-bottom:10px}
 .disc-in{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:14px 18px;display:flex;gap:14px;align-items:flex-start;margin-bottom:18px}
 .disc-in .ic{width:30px;height:30px;border-radius:9px;background:rgba(245,158,11,.14);display:grid;place-items:center;flex-shrink:0}

@@ -146,15 +146,17 @@ export default function Screening({ isMock }) {
   const [error, setError] = useState(null);
   const [gradcam, setGradcam] = useState(null);     // base64 overlay data URI
   const [explaining, setExplaining] = useState(false);
+  const [gradcamClass, setGradcamClass] = useState(null);
   const [fundusWarn, setFundusWarn] = useState(null);
   const [ackNonFundus, setAckNonFundus] = useState(false);
 
-  const explain = useCallback(async () => {
+  const explain = useCallback(async (className) => {
     if (!imageFile) return;
     setExplaining(true);
     try {
-      const data = await explainImage(imageFile);
+      const data = await explainImage(imageFile, className);
       setGradcam(data.gradcam || null);
+      setGradcamClass(data.gradcam_class || null);
     } catch (e) {
       setError(`Could not generate explanation: ${e.message}`);
     } finally {
@@ -273,7 +275,7 @@ export default function Screening({ isMock }) {
               <div className="result-actions">
                 <button className="btn btn-ghost" onClick={() => window.print()}>Export / print report</button>
                 {imageFile && result.disease && result.disease.is_mock === false && (
-                  <button className="btn btn-ghost" onClick={explain} disabled={explaining}>
+                  <button className="btn btn-ghost" onClick={() => explain()} disabled={explaining}>
                     {explaining ? "Generating…" : "Explain prediction"}
                   </button>
                 )}
@@ -282,9 +284,24 @@ export default function Screening({ isMock }) {
               {gradcam && (
                 <div className="gradcam-panel">
                   <div className="sub-lbl">Grad-CAM — where the model looked</div>
+                  {result.disease?.probabilities && (
+                    <div className="gradcam-classes">
+                      {Object.keys(result.disease.probabilities).map((cls) => (
+                        <button
+                          key={cls}
+                          type="button"
+                          className={`gc-class ${gradcamClass === cls ? "on" : ""}`}
+                          onClick={() => explain(cls)}
+                          disabled={explaining}
+                        >
+                          {cls.replace(/_/g, " ")}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   <img src={gradcam} alt="Grad-CAM heatmap overlay" className="gradcam-img" />
                   <p className="muted small">
-                    Warm regions show the areas of the fundus that most influenced the prediction
+                    {gradcamClass ? `Showing: ${gradcamClass.replace(/_/g, " ")}. ` : ""}Warm regions show the areas of the fundus that most influenced the prediction
                     (ResNet branch). This is an explainability aid, not a diagnostic marker.
                   </p>
                 </div>

@@ -79,10 +79,11 @@ export function scoreSession({ file, symptoms, fatigue }) {
 }
 
 // ----- Grad-CAM explainability (posts the same fundus image to the explain endpoint) -----
-export function explainImage(file) {
+export function explainImage(file, className) {
   const fd = new FormData();
   fd.append("file", file);
-  return fetch(`${API_BASE}/api/screen/image/explain`, {
+  const qs = className ? `?class_name=${encodeURIComponent(className)}` : "";
+  return fetch(`${API_BASE}/api/screen/image/explain${qs}`, {
     method: "POST",
     headers: { ...authHeader() },
     body: fd,
