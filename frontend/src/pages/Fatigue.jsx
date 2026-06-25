@@ -27,6 +27,7 @@ export default function Fatigue() {
   const audioCtxRef = useRef(null);
   const meshRef = useRef(null);
   const latestLandmarksRef = useRef(null);
+  const failCountRef = useRef(0);
 
   const [modelsReady, setModelsReady] = useState(false);
   const [camStatus, setCamStatus] = useState("idle");
@@ -145,7 +146,13 @@ export default function Fatigue() {
       setEarHistory((prev) => [...prev.slice(-(SPARK_LEN - 1)), snap.ear]);
       if (snap.drowsy && !drowsyRef.current) beep();
       drowsyRef.current = !!snap.drowsy;
-    } catch (_) {}
+      if (failCountRef.current !== 0) { failCountRef.current = 0; setError(null); }
+    } catch (_) {
+      failCountRef.current += 1;
+      if (failCountRef.current === 3) {
+        setError("Lost connection to the scoring server — is the backend running on :8000? Retrying…");
+      }
+    }
   }, [beep]);
 
   const runLoop = useCallback(async () => {

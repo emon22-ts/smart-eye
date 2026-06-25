@@ -96,21 +96,34 @@ export function ClassBars({ probabilities, topClass }) {
 
 // A 1-5 Likert selector row.
 export function LikertRow({ label, value, onChange }) {
+  const onKey = (e) => {
+    let next = null;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") next = Math.min(5, (value || 0) + 1);
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = Math.max(1, (value || 1) - 1);
+    else if (e.key === "Home") next = 1;
+    else if (e.key === "End") next = 5;
+    if (next != null) { e.preventDefault(); onChange(next); }
+  };
   return (
     <div className="likert">
       <span className="likert-label">{label}</span>
-      <div className="likert-btns">
-        {[1, 2, 3, 4, 5].map((n) => (
-          <button
-            key={n}
-            type="button"
-            className={`likert-btn ${value === n ? "on" : ""}`}
-            onClick={() => onChange(n)}
-            aria-pressed={value === n}
-          >
-            {n}
-          </button>
-        ))}
+      <div className="likert-btns" role="radiogroup" aria-label={label} onKeyDown={onKey}>
+        {[1, 2, 3, 4, 5].map((n) => {
+          const selected = value === n;
+          return (
+            <button
+              key={n}
+              type="button"
+              className={`likert-btn ${selected ? "on" : ""}`}
+              onClick={() => onChange(n)}
+              role="radio"
+              aria-checked={selected}
+              tabIndex={selected || (!value && n === 1) ? 0 : -1}
+            >
+              {n}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -158,6 +171,10 @@ export function Dropzone({ preview, onSelect, inputRef }) {
       onDrop={handleDrop}
       role="button"
       tabIndex={0}
+      aria-label="Upload a fundus image"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); inputRef.current?.click(); }
+      }}
     >
       {preview ? (
         <img src={preview} alt="Fundus preview" className="preview-img" />
@@ -188,6 +205,88 @@ export function Met({ label, value, accent }) {
     <div className="met">
       <div className="met-l">{label}</div>
       <div className="met-v" style={accent ? { color: accent } : undefined}>{value}</div>
+    </div>
+  );
+}
+
+// Capture a fundus image straight from the webcam (handy when you do not have the
+// file to hand). The captured frame is handed back as a File to the normal
+// screening flow, so the rest of the pipeline is unchanged.
+export function WebcamCapture({ onCapture }) {
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  const [err, setErr] = useState(null);
+
+  const stop = () => {
+    const s = streamRef.current;
+    if (s) s.getTracks().forEach((t) => t.stop());
+    streamRef.current = null;
+    if (videoRef.current) videoRef.current.srcObject = null;
+  };
+
+  const start = async () => {
+    setErr(null);
+    setOpen(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 1280 }, height: { ideal: 960 } },
+        audio: false,
+      });
+      streamRef.current = stream;
+      const v = videoRef.current;
+      if (v) { v.srcObject = stream; await v.play(); }
+    } catch (e) {
+      setErr(`Could not start the camera: ${e.message}`);
+    }
+  };
+
+  const cancel = () => { stop(); setOpen(false); setErr(null); };
+
+  const capture = () => {
+    const v = videoRef.current;
+    if (!v || !v.videoWidth) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = v.videoWidth;
+    canvas.height = v.videoHeight;
+    canvas.getContext("2d").drawImage(v, 0, 0);
+    canvas.toBlob(
+      (blob) => {
+        if (blob) {
+          const file = new File([blob], `capture-${Date.now()}.jpg`, { type: "image/jpeg" });
+          onCapture(file);
+        }
+        stop();
+        setOpen(false);
+      },
+      "image/jpeg",
+      0.92
+    );
+  };
+
+  useEffect(() => () => stop(), []);
+
+  if (!open) {
+    return (
+      <button type="button" className="btn btn-ghost cam-capture-btn" onClick={start}>
+        Take a photo with camera
+      </button>
+    );
+  }
+
+  return (
+    <div className="capture-panel">
+      {err ? (
+        <div className="err-strip">{err}</div>
+      ) : (
+        <div className="capture-cam">
+          <video ref={videoRef} className="capture-video" muted playsInline />
+        </div>
+      )}
+      <div className="capture-controls">
+        <button type="button" className="btn btn-primary" onClick={capture} disabled={!!err}>Capture</button>
+        <button type="button" className="btn btn-ghost" onClick={cancel}>Cancel</button>
+      </div>
     </div>
   );
 }
@@ -412,14 +511,35 @@ export function AuthModal({ open, onClose }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
   const [googleOn, setGoogleOn] = useState(false);
+  const modalRef = useRef(null);
+  const lastFocusRef = useRef(null);
 
   useEffect(() => {
     if (!open) return undefined;
     setError(null);
     getHealth().then((h) => setGoogleOn(!!h.google_auth_configured)).catch(() => {});
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    lastFocusRef.current = document.activeElement;
+    const sel = 'button:not([disabled]), [href], input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
+    const t = setTimeout(() => {
+      const f = modalRef.current?.querySelectorAll(sel);
+      (f && f.length ? f[0] : modalRef.current)?.focus();
+    }, 0);
+    const onKey = (e) => {
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key === "Tab" && modalRef.current) {
+        const f = modalRef.current.querySelectorAll(sel);
+        if (!f.length) return;
+        const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener("keydown", onKey);
+      if (lastFocusRef.current && lastFocusRef.current.focus) lastFocusRef.current.focus();
+    };
   }, [open, onClose]);
 
   if (!open) return null;
@@ -449,7 +569,7 @@ export function AuthModal({ open, onClose }) {
   return createPortal(
     <div className="amodal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <style>{AUTH_MODAL_CSS}</style>
-      <div className="amodal" role="dialog" aria-modal="true">
+      <div className="amodal" role="dialog" aria-modal="true" aria-label="Authentication" ref={modalRef} tabIndex={-1}>
         <button className="amodal-x" onClick={onClose} aria-label="Close">×</button>
         <div className="amodal-logo"><EyeLogo /></div>
         <h2 className="amodal-h">{isReg ? "Create your account" : "Welcome back"}</h2>
@@ -525,6 +645,12 @@ export function NavBar({ isMock, theme, onToggleTheme }) {
   const [authOpen, setAuthOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
+  const modelPill =
+    isMock == null
+      ? { cls: "", txt: "…" }
+      : isMock
+      ? { cls: "pill-warn", txt: "Mock" }
+      : { cls: "pill-ok", txt: "Live" };
   return (
     <nav className="se-nav">
       <style>{`.se-signin{padding:8px 17px;border:0;border-radius:10px;background:linear-gradient(135deg,#3B82F6,#06B6D4);color:#fff;font:700 13px/1 'Sora',sans-serif;letter-spacing:.2px;cursor:pointer;transition:transform .12s,box-shadow .12s,filter .12s;box-shadow:0 6px 16px rgba(59,130,246,.32);white-space:nowrap}.se-signin:hover{transform:translateY(-1px);filter:brightness(1.06);box-shadow:0 9px 20px rgba(59,130,246,.42)}`}</style>
@@ -540,8 +666,8 @@ export function NavBar({ isMock, theme, onToggleTheme }) {
           <NavLink to="/history">History</NavLink>
         </div>
         <div className="nav-status">
-          <span className={`pill pill-sm ${isMock ? "pill-warn" : "pill-ok"}`}>
-            <span className="dot" />{isMock ? "Mock" : "Live"}
+          <span className={`pill pill-sm ${modelPill.cls}`}>
+            <span className="dot" />{modelPill.txt}
           </span>
           <ThemeToggle theme={theme} onToggle={onToggleTheme} />
           <NotificationsBell isMock={isMock} />
@@ -565,8 +691,8 @@ export function NavBar({ isMock, theme, onToggleTheme }) {
           <NavLink to="/fatigue" onClick={closeMenu}>Fatigue</NavLink>
           <NavLink to="/history" onClick={closeMenu}>History</NavLink>
           <div className="nav-mobile-foot">
-            <span className={`pill pill-sm ${isMock ? "pill-warn" : "pill-ok"}`}>
-              <span className="dot" />{isMock ? "Mock" : "Live"}
+            <span className={`pill pill-sm ${modelPill.cls}`}>
+              <span className="dot" />{modelPill.txt}
             </span>
             {!user && (
               <button className="se-signin" onClick={() => { setAuthOpen(true); closeMenu(); }}>

@@ -13,6 +13,38 @@ import Fatigue from "./pages/Fatigue.jsx";
 import History from "./pages/History.jsx";
 import Login from "./pages/Login.jsx";
 
+// Catches render-time errors anywhere below it, so one thrown error shows a
+// recovery screen instead of unmounting the whole app to a blank white page.
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error, info) {
+    // eslint-disable-next-line no-console
+    console.error("Smart Eye render error:", error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="boot" role="alert">
+          <h2 style={{ color: "var(--fg)", fontSize: 20, fontWeight: 600 }}>Something went wrong</h2>
+          <p style={{ maxWidth: 420, textAlign: "center" }}>
+            The interface hit an unexpected error and stopped rendering. Your data is safe.
+          </p>
+          <button className="btn btn-primary" onClick={() => window.location.reload()}>
+            Reload the app
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function Shell({ isMock, theme, onToggleTheme, isAuthed }) {
   return (
     <>
@@ -32,7 +64,7 @@ function Shell({ isMock, theme, onToggleTheme, isAuthed }) {
 
 export default function App() {
   const { ready, isAuthed } = useAuth();
-  const [isMock, setIsMock] = useState(true);
+  const [isMock, setIsMock] = useState(null); // null = health not known yet (prevents a false MOCK flash on load)
   const [theme, setTheme] = useState(
     () => (typeof localStorage !== "undefined" && localStorage.getItem("se_theme")) || "dark"
   );
@@ -56,7 +88,9 @@ export default function App() {
       {!ready ? (
         <div className="boot"><div className="boot-spin" />Loading…</div>
       ) : (
-        <Shell isMock={isMock} theme={theme} onToggleTheme={toggleTheme} isAuthed={isAuthed} />
+        <ErrorBoundary>
+          <Shell isMock={isMock} theme={theme} onToggleTheme={toggleTheme} isAuthed={isAuthed} />
+        </ErrorBoundary>
       )}
     </div>
   );

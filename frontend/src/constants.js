@@ -1,5 +1,4 @@
 // Shared constants for the Smart Eye frontend.
-export const MODEL_URL = "https://justadudewhohacks.github.io/face-api.js/models";
 export const FRAME_INTERVAL_MS = 120; // ~8 Hz landmark detection + POST
 export const SPARK_LEN = 60;
 export const EAR_THRESHOLD = 0.25;

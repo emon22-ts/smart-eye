@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { listSessions, deleteSession } from "../api";
 import { COLOURS } from "../constants";
+import { Met } from "../components";
 
 // Small self-contained OHI trend sparkline (0-100 scale, oldest -> newest).
 function OhiTrend({ values }) {
@@ -26,6 +27,59 @@ function OhiTrend({ values }) {
       <line x1="0" y1={ty} x2={w} y2={ty} stroke="var(--warning)" strokeWidth="1" strokeDasharray="4 3" opacity="0.6" />
       <polyline points={pts} fill="none" stroke="#22d3ee" strokeWidth="2" vectorEffect="non-scaling-stroke" />
     </svg>
+  );
+}
+
+// Side-by-side comparison of any two saved sessions (uses already-loaded rows).
+function CompareSessions({ rows }) {
+  const valid = (rows || []).filter((r) => r.ohi != null);
+  const [aId, setAId] = useState(valid[0]?.id);
+  const [bId, setBId] = useState(valid[1]?.id);
+  if (valid.length < 2) {
+    return <p className="muted small">Run at least two screenings to compare them.</p>;
+  }
+  const A = valid.find((r) => r.id === aId) || valid[0];
+  const B = valid.find((r) => r.id === bId) || valid[1];
+  const fmt = (r) => new Date(r.created_at).toLocaleString();
+  const conf = (r) => (r.top_confidence == null ? "\u2014" : `${(r.top_confidence * 100).toFixed(0)}%`);
+  const finding = (r) => (r.top_class || "\u2014").replace(/_/g, " ");
+  const fat = (r) => (r.fatigue_score == null ? "\u2014" : `${Math.round(r.fatigue_score)}/100`);
+  const ohiDelta = Math.round(B.ohi - A.ohi);
+  const lines = [
+    ["OHI", Math.round(A.ohi), Math.round(B.ohi)],
+    ["Risk", A.band || "\u2014", B.band || "\u2014"],
+    ["Top finding", finding(A), finding(B)],
+    ["Confidence", conf(A), conf(B)],
+    ["Fatigue", fat(A), fat(B)],
+  ];
+  return (
+    <div className="cmp">
+      <div className="cmp-selects">
+        <select value={aId} onChange={(e) => setAId(Number(e.target.value))}>
+          {valid.map((r) => <option key={r.id} value={r.id}>{`${fmt(r)} \u00b7 OHI ${Math.round(r.ohi)}`}</option>)}
+        </select>
+        <span className="cmp-vs">vs</span>
+        <select value={bId} onChange={(e) => setBId(Number(e.target.value))}>
+          {valid.map((r) => <option key={r.id} value={r.id}>{`${fmt(r)} \u00b7 OHI ${Math.round(r.ohi)}`}</option>)}
+        </select>
+      </div>
+      <div className="cmp-grid">
+        {lines.map(([label, a, b]) => (
+          <div className="cmp-line" key={label}>
+            <span className="cmp-a">{a}</span>
+            <span className="cmp-lbl">{label}</span>
+            <span className="cmp-b">{b}</span>
+          </div>
+        ))}
+      </div>
+      <p className="muted small cmp-foot">
+        OHI change (right vs left):{" "}
+        <b style={{ color: ohiDelta > 0 ? "var(--success)" : ohiDelta < 0 ? "var(--danger)" : "var(--muted)" }}>
+          {ohiDelta > 0 ? `+${ohiDelta}` : ohiDelta}
+        </b>{" "}
+        {"\u2014 higher is healthier."}
+      </p>
+    </div>
   );
 }
 
@@ -97,6 +151,25 @@ export default function History() {
     ? rows.filter((r) => r.ohi != null).map((r) => r.ohi).reverse()
     : [];
 
+  // Summary analytics over all sessions (computed entirely in the browser).
+  const withOhi = (rows || []).filter((r) => r.ohi != null);
+  const stats = withOhi.length
+    ? {
+        count: rows.length,
+        avg: Math.round(withOhi.reduce((a, r) => a + r.ohi, 0) / withOhi.length),
+        latest: Math.round(withOhi[0].ohi),
+        highRisk: (rows || []).filter((r) => r.colour === "red").length,
+      }
+    : null;
+  let trendArrow = "";
+  let trendColour;
+  if (stats && withOhi.length >= 2) {
+    const delta = withOhi[0].ohi - withOhi[1].ohi; // newest minus previous
+    if (delta > 1) { trendArrow = " ↑"; trendColour = "var(--success)"; }
+    else if (delta < -1) { trendArrow = " ↓"; trendColour = "var(--danger)"; }
+    else { trendArrow = " →"; }
+  }
+
   return (
     <main className="se-wrap page">
       <div className="page-head">
@@ -112,10 +185,27 @@ export default function History() {
           <div className="card-head">
             <span className="eyebrow">Trend</span><h3>Ocular Health Index over time</h3>
           </div>
+          {stats && (
+            <div className="metric-row" style={{ marginBottom: 16 }}>
+              <Met label="Screenings" value={stats.count} />
+              <Met label="Average OHI" value={stats.avg} />
+              <Met label="Latest OHI" value={`${stats.latest}${trendArrow}`} accent={trendColour} />
+              <Met label="High-risk" value={stats.highRisk} accent={stats.highRisk > 0 ? "var(--danger)" : undefined} />
+            </div>
+          )}
           <OhiTrend values={ohiSeries} />
           <p className="muted small" style={{ marginTop: 8 }}>
             Oldest → newest. Dashed line marks OHI 67 (the Low/Moderate boundary). Higher is healthier.
           </p>
+        </section>
+      )}
+
+      {rows && rows.length >= 2 && (
+        <section className="card" style={{ marginBottom: 16 }}>
+          <div className="card-head">
+            <span className="eyebrow">Compare</span><h3>Compare two screenings</h3>
+          </div>
+          <CompareSessions rows={rows} />
         </section>
       )}
 
