@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./auth";
+import { LangProvider } from "./i18n";
 import App from "./App.jsx";
 
 const container = document.getElementById("root");
@@ -11,7 +12,9 @@ createRoot(container).render(
   <React.StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <LangProvider>
+          <App />
+        </LangProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>

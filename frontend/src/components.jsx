@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { NavLink } from "react-router-dom";
 import { COLOURS, SPARK_LEN } from "./constants";
 import { useAuth } from "./auth";
+import { useT, LANGS } from "./i18n";
 import { listSessions, getHealth } from "./api";
 
 export const EyeLogo = () => (
@@ -642,6 +643,7 @@ export function AuthModal({ open, onClose }) {
 
 export function NavBar({ isMock, theme, onToggleTheme }) {
   const { user } = useAuth();
+  const { t, lang, setLang } = useT();
   const [authOpen, setAuthOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
@@ -657,13 +659,13 @@ export function NavBar({ isMock, theme, onToggleTheme }) {
       <div className="se-wrap nav-in">
         <NavLink to="/" className="brand" onClick={closeMenu}>
           <div className="logo"><EyeLogo /></div>
-          <div><b>SMART EYE</b><span className="tag">Clinical Intelligence</span></div>
+          <div><b>SMART EYE</b><span className="tag">{t("nav.brandSub")}</span></div>
         </NavLink>
         <div className="nav-links">
-          <NavLink to="/" end>Home</NavLink>
-          <NavLink to="/screening">Screening</NavLink>
-          <NavLink to="/fatigue">Fatigue</NavLink>
-          <NavLink to="/history">History</NavLink>
+          <NavLink to="/" end>{t("nav.home")}</NavLink>
+          <NavLink to="/screening">{t("nav.screening")}</NavLink>
+          <NavLink to="/fatigue">{t("nav.fatigue")}</NavLink>
+          <NavLink to="/history">{t("nav.history")}</NavLink>
         </div>
         <div className="nav-status">
           <span className={`pill pill-sm ${modelPill.cls}`}>
@@ -671,7 +673,10 @@ export function NavBar({ isMock, theme, onToggleTheme }) {
           </span>
           <ThemeToggle theme={theme} onToggle={onToggleTheme} />
           <NotificationsBell isMock={isMock} />
-          {!user && <button className="se-signin" onClick={() => setAuthOpen(true)}>Sign in</button>}
+          <button className="lang-switch" onClick={() => setLang(lang === "en" ? "bn" : "en")} aria-label="Switch language" title="Switch language">
+            {(LANGS.find((l) => l.code !== lang) || LANGS[0]).label}
+          </button>
+          {!user && <button className="se-signin" onClick={() => setAuthOpen(true)}>{t("nav.signIn")}</button>}
           <UserMenu onSignIn={() => setAuthOpen(true)} />
         </div>
         <button
@@ -686,17 +691,17 @@ export function NavBar({ isMock, theme, onToggleTheme }) {
 
       {menuOpen && (
         <div className="nav-mobile">
-          <NavLink to="/" end onClick={closeMenu}>Home</NavLink>
-          <NavLink to="/screening" onClick={closeMenu}>Screening</NavLink>
-          <NavLink to="/fatigue" onClick={closeMenu}>Fatigue</NavLink>
-          <NavLink to="/history" onClick={closeMenu}>History</NavLink>
+          <NavLink to="/" end onClick={closeMenu}>{t("nav.home")}</NavLink>
+          <NavLink to="/screening" onClick={closeMenu}>{t("nav.screening")}</NavLink>
+          <NavLink to="/fatigue" onClick={closeMenu}>{t("nav.fatigue")}</NavLink>
+          <NavLink to="/history" onClick={closeMenu}>{t("nav.history")}</NavLink>
           <div className="nav-mobile-foot">
             <span className={`pill pill-sm ${modelPill.cls}`}>
               <span className="dot" />{modelPill.txt}
             </span>
             {!user && (
               <button className="se-signin" onClick={() => { setAuthOpen(true); closeMenu(); }}>
-                Sign in
+                {t("nav.signIn")}
               </button>
             )}
           </div>

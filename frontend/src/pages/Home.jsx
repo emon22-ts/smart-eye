@@ -2,6 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { IrisVisual } from "../components";
+import { useT } from "../i18n";
 
 const FEATURES = [
   {
@@ -38,26 +39,26 @@ const FEATURES = [
 
 export default function Home() {
   const nav = useNavigate();
+  const { t } = useT();
   return (
     <main className="se-wrap page home">
       <header className="hero hero-home">
         <div className="hero-copy">
-          <span className="pill hero-pill"><span className="dot dot-cyan" />Preliminary screening workflow · v2.4</span>
+          <span className="pill hero-pill"><span className="dot dot-cyan" />{t("home.badge")} · v2.4</span>
           <h1 className="hero-h">SMART <span className="eye-grad">EYE</span></h1>
-          <p className="hero-sub">AI-Powered Preliminary Vision Screening Platform</p>
+          <p className="hero-sub">{t("home.tagline")}</p>
           <p className="hero-desc">
-            Screen fundus conditions, monitor visual fatigue in real time, and generate explainable ocular
-            health assessments using computer vision, fuzzy intelligence, and privacy-first on-device processing.
+            {t("home.intro")}
           </p>
           <div className="hero-btns">
-            <button className="btn btn-primary btn-lg" onClick={() => nav("/screening")}>Start Screening →</button>
-            <button className="btn btn-ghost btn-lg" onClick={() => nav("/fatigue")}>Live Fatigue Monitor</button>
+            <button className="btn btn-primary btn-lg" onClick={() => nav("/screening")}>{t("home.startBtn")} →</button>
+            <button className="btn btn-ghost btn-lg" onClick={() => nav("/fatigue")}>{t("home.fatigueBtn")}</button>
           </div>
           <div className="trust">
-            <span>AI-Assisted Screening</span>
-            <span>Real-Time Fatigue Monitoring</span>
-            <span>Explainable Results</span>
-            <span>GDPR-Compliant Local Processing</span>
+            <span>{t("home.feat1")}</span>
+            <span>{t("home.feat2")}</span>
+            <span>{t("home.feat3")}</span>
+            <span>{t("home.feat4")}</span>
           </div>
         </div>
         <div className="hero-visual"><IrisVisual /></div>
