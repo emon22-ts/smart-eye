@@ -5,36 +5,12 @@ import { IrisVisual } from "../components";
 import { useT } from "../i18n";
 
 const FEATURES = [
-  {
-    title: "Fundus disease screening",
-    desc: "CNN classification across four fundus classes (Normal, Cataract, Glaucoma, Diabetic Retinopathy) with calibrated confidence.",
-    path: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z",
-  },
-  {
-    title: "Real-time fatigue monitoring",
-    desc: "In-browser webcam EAR tracking, blink-rate analysis and drowsiness detection with a live landmark overlay.",
-    path: "M3 12h4l2 5 4-12 2 7h6",
-  },
-  {
-    title: "Ocular Health Index",
-    desc: "A single 0–100 score fusing CNN confidence, fatigue and symptom burden through a transparent fuzzy engine.",
-    path: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z M12 7v5l3 2",
-  },
-  {
-    title: "Transparent fuzzy logic",
-    desc: "A Mamdani inference system maps the three inputs to risk — every rule activation is inspectable, not a black box.",
-    path: "M4 7h16 M4 12h16 M4 17h10",
-  },
-  {
-    title: "Session history & audit",
-    desc: "Every screening is persisted locally with its scores and timestamp, so results are reviewable and reproducible.",
-    path: "M4 4h16v16H4Z M4 9h16 M9 21V9",
-  },
-  {
-    title: "Privacy-first by design",
-    desc: "Face detection runs on-device; only landmark coordinates leave the browser. No cloud image storage.",
-    path: "M12 3l8 4v6c0 5-4 7-8 8-4-1-8-3-8-8V7Z",
-  },
+  { tk: "home.c1.t", dk: "home.c1.d", path: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" },
+  { tk: "home.c2.t", dk: "home.c2.d", path: "M3 12h4l2 5 4-12 2 7h6" },
+  { tk: "home.c3.t", dk: "home.c3.d", path: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z M12 7v5l3 2" },
+  { tk: "home.c4.t", dk: "home.c4.d", path: "M4 7h16 M4 12h16 M4 17h10" },
+  { tk: "home.c5.t", dk: "home.c5.d", path: "M4 4h16v16H4Z M4 9h16 M9 21V9" },
+  { tk: "home.c6.t", dk: "home.c6.d", path: "M12 3l8 4v6c0 5-4 7-8 8-4-1-8-3-8-8V7Z" },
 ];
 
 export default function Home() {
@@ -65,19 +41,19 @@ export default function Home() {
       </header>
 
       <section className="features">
-        <span className="eyebrow">The Platform</span>
-        <h2 className="h2">A complete preliminary screening pipeline</h2>
-        <p className="lead">From fundus classification to fuzzy-logic risk synthesis — every stage is transparent, reproducible, and runs locally on-device.</p>
+        <span className="eyebrow">{t("home.plat.eyebrow")}</span>
+        <h2 className="h2">{t("home.plat.title")}</h2>
+        <p className="lead">{t("home.plat.lead")}</p>
         <div className="feat-grid">
           {FEATURES.map((f) => (
-            <div className="fcard" key={f.title}>
+            <div className="fcard" key={f.tk}>
               <div className="ic">
                 <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.7" stroke="#60A5FA" strokeLinecap="round" strokeLinejoin="round">
                   <path d={f.path} />
                 </svg>
               </div>
-              <h3>{f.title}</h3>
-              <p>{f.desc}</p>
+              <h3>{t(f.tk)}</h3>
+              <p>{t(f.dk)}</p>
             </div>
           ))}
         </div>
