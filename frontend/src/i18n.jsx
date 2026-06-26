@@ -83,6 +83,60 @@ const DICT = {
   "home.c5.d": { en: "Every screening is persisted locally with its scores and timestamp, so results are reviewable and reproducible.", bn: "প্রতিটি স্ক্রিনিং তার স্কোর ও টাইমস্ট্যাম্প সহ স্থানীয়ভাবে সংরক্ষিত হয়, তাই ফলাফল পর্যালোচনাযোগ্য ও পুনরুৎপাদনযোগ্য।" },
   "home.c6.t": { en: "Privacy-first by design", bn: "গোপনীয়তা-প্রথম নকশা" },
   "home.c6.d": { en: "Face detection runs on-device; only landmark coordinates leave the browser. No cloud image storage.", bn: "ফেস সনাক্তকরণ ডিভাইসেই চলে; শুধু ল্যান্ডমার্ক স্থানাঙ্ক ব্রাউজার ছাড়ে। কোনো ক্লাউড ইমেজ স্টোরেজ নেই।" },
+
+  // ---- screening page ----
+  "screen.lead":        { en: "Upload a fundus image and rate your symptoms. The server fuses both into a fuzzy-logic risk score.", bn: "একটি ফান্ডাস ছবি আপলোড করুন ও আপনার উপসর্গ মূল্যায়ন করুন। সার্ভার উভয়কে একটি ফাজি-লজিক ঝুঁকি স্কোরে একত্রিত করে।" },
+  "screen.step1":       { en: "Step 1", bn: "ধাপ ১" },
+  "screen.inputs":      { en: "Screening inputs", bn: "স্ক্রিনিং ইনপুট" },
+  "screen.symptomSurvey": { en: "Symptom survey · 1 (none) – 5 (severe)", bn: "উপসর্গ জরিপ · ১ (নেই) – ৫ (তীব্র)" },
+  "screen.scoring":     { en: "Scoring…", bn: "স্কোরিং…" },
+  "screen.runArrow":    { en: "Run screening →", bn: "স্ক্রিনিং চালান →" },
+  "screen.noImageHint": { en: "No image? You'll still get an OHI from symptoms alone — disease screening is simply skipped.", bn: "ছবি নেই? আপনি কেবল উপসর্গ থেকেও একটি OHI পাবেন — রোগ স্ক্রিনিং কেবল বাদ দেওয়া হয়।" },
+  "screen.ghostText":   { en: "Run a screening to generate your Ocular Health Index, class probabilities, and triage recommendation.", bn: "আপনার চক্ষু স্বাস্থ্য সূচক, শ্রেণি সম্ভাবনা ও ট্রায়াজ সুপারিশ তৈরি করতে একটি স্ক্রিনিং চালান।" },
+  "screen.fundusAck":   { en: "I understand. Screen this image anyway.", bn: "আমি বুঝেছি। তবুও এই ছবিটি স্ক্রিন করুন।" },
+  "screen.resultEyebrow": { en: "Result", bn: "ফলাফল" },
+  "screen.mockStrip":   { en: "Mock model — placeholder probabilities, not a screening result.", bn: "মক মডেল — স্থানধারক সম্ভাবনা, কোনো স্ক্রিনিং ফলাফল নয়।" },
+  "screen.diseaseProbs": { en: "Disease probabilities", bn: "রোগের সম্ভাবনা" },
+  "screen.recSteps":    { en: "Recommended next steps", bn: "প্রস্তাবিত পরবর্তী পদক্ষেপ" },
+  "screen.lowConf":     { en: "Low model confidence", bn: "মডেলের আত্মবিশ্বাস কম" },
+  "screen.lowConfTail": { en: "This result is uncertain — treat it with extra caution and prioritise professional review.", bn: "এই ফলাফলটি অনিশ্চিত — অতিরিক্ত সতর্কতার সাথে নিন এবং পেশাদার পর্যালোচনাকে অগ্রাধিকার দিন।" },
+  "screen.generating":  { en: "Generating…", bn: "তৈরি হচ্ছে…" },
+  "screen.savedHist":   { en: "Saved to history", bn: "ইতিহাসে সংরক্ষিত" },
+  "screen.signInSave":  { en: "Sign in to save this result to your history.", bn: "এই ফলাফলটি আপনার ইতিহাসে সংরক্ষণ করতে সাইন ইন করুন।" },
+  "screen.gradcamTitle": { en: "Grad-CAM — where the model looked", bn: "Grad-CAM — মডেল যেখানে দেখেছে" },
+  "screen.showing":     { en: "Showing", bn: "দেখানো হচ্ছে" },
+  "screen.gradcamCaption": { en: "Warm regions show the areas of the fundus that most influenced the prediction (ResNet branch). This is an explainability aid, not a diagnostic marker.", bn: "উষ্ণ অঞ্চলগুলি ফান্ডাসের সেই এলাকাগুলি দেখায় যা পূর্বাভাসকে সবচেয়ে বেশি প্রভাবিত করেছে (ResNet শাখা)। এটি একটি ব্যাখ্যামূলক সহায়ক, রোগনির্ণয়ের চিহ্ন নয়।" },
+
+  // ---- batch screening ----
+  "batch.eyebrow":      { en: "Batch", bn: "ব্যাচ" },
+  "batch.title":        { en: "Batch screening", bn: "ব্যাচ স্ক্রিনিং" },
+  "batch.intro":        { en: "Screen several fundus images at once. Each is scored on the image alone (symptoms neutral) and saved to history.", bn: "একসাথে একাধিক ফান্ডাস ছবি স্ক্রিন করুন। প্রতিটি কেবল ছবির ভিত্তিতে স্কোর করা হয় (উপসর্গ নিরপেক্ষ) এবং ইতিহাসে সংরক্ষিত হয়।" },
+  "batch.select":       { en: "Select fundus images", bn: "ফান্ডাস ছবি নির্বাচন করুন" },
+  "batch.screenAll":    { en: "Screen all", bn: "সব স্ক্রিন করুন" },
+  "batch.colFile":      { en: "File", bn: "ফাইল" },
+  "batch.colOhi":       { en: "OHI", bn: "OHI" },
+  "batch.colRisk":      { en: "Risk", bn: "ঝুঁকি" },
+  "batch.colTop":       { en: "Top finding", bn: "শীর্ষ ফলাফল" },
+  "batch.colConf":      { en: "Conf.", bn: "আত্মবিশ্বাস" },
+  "batch.imagesSelected": { en: "image(s) selected", bn: "ছবি নির্বাচিত" },
+  "batch.failed":       { en: "Failed", bn: "ব্যর্থ" },
+
+  // ---- dropzone / camera ----
+  "drop.main":          { en: "Drop a fundus image, or click to browse", bn: "একটি ফান্ডাস ছবি ফেলুন, বা ব্রাউজ করতে ক্লিক করুন" },
+  "drop.sub":           { en: "JPEG / PNG · 4-class screening", bn: "JPEG / PNG · ৪-শ্রেণি স্ক্রিনিং" },
+  "drop.camera":        { en: "Take a photo with camera", bn: "ক্যামেরা দিয়ে ছবি তুলুন" },
+
+  // ---- symptom labels ----
+  "symptom.pain":           { en: "Eye pain", bn: "চোখে ব্যথা" },
+  "symptom.redness":        { en: "Redness", bn: "লালভাব" },
+  "symptom.photophobia":    { en: "Light sensitivity", bn: "আলোক সংবেদনশীলতা" },
+  "symptom.blurred_vision": { en: "Blurred vision", bn: "ঝাপসা দৃষ্টি" },
+
+  // ---- disease class names ----
+  "class.Normal":               { en: "Normal", bn: "নরমাল" },
+  "class.Cataract":             { en: "Cataract", bn: "ছানি" },
+  "class.Glaucoma":             { en: "Glaucoma", bn: "গ্লুকোমা" },
+  "class.Diabetic_Retinopathy": { en: "Diabetic Retinopathy", bn: "ডায়াবেটিক রেটিনোপ্যাথি" },
 };
 
 const LangCtx = createContext({ lang: "en", t: (k) => k, setLang: () => {} });

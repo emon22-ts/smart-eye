@@ -156,6 +156,7 @@ export function Sparkline({ history, threshold }) {
 
 // Image dropzone with click-to-browse and drag-and-drop.
 export function Dropzone({ preview, onSelect, inputRef }) {
+  const { t } = useT();
   const [drag, setDrag] = useState(false);
   const handleDrop = (e) => {
     e.preventDefault();
@@ -182,8 +183,8 @@ export function Dropzone({ preview, onSelect, inputRef }) {
       ) : (
         <div className="dz-empty">
           <div className="dz-ic">⬆</div>
-          <div>Drop a fundus image, or click to browse</div>
-          <div className="muted small">JPEG / PNG · 4-class screening</div>
+          <div>{t("drop.main")}</div>
+          <div className="muted small">{t("drop.sub")}</div>
         </div>
       )}
       <input
@@ -214,6 +215,7 @@ export function Met({ label, value, accent }) {
 // file to hand). The captured frame is handed back as a File to the normal
 // screening flow, so the rest of the pipeline is unchanged.
 export function WebcamCapture({ onCapture }) {
+  const { t } = useT();
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -270,7 +272,7 @@ export function WebcamCapture({ onCapture }) {
   if (!open) {
     return (
       <button type="button" className="btn btn-ghost cam-capture-btn" onClick={start}>
-        Take a photo with camera
+        {t("drop.camera")}
       </button>
     );
   }

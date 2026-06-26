@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { scoreSession, explainImage } from "../api";
 import { SYMPTOMS, DISCLAIMER, COLOURS } from "../constants";
 import { Banners, Dropzone, LikertRow, OHIGauge, ClassBars, WebcamCapture } from "../components";
+import { useT } from "../i18n";
 
 // Lightweight client-side guard: does this image plausibly look like a retinal
 // fundus photograph? Fundus images are strongly red-dominant (the retina) and
@@ -52,6 +53,7 @@ async function looksLikeFundus(file) {
 // the image alone (symptoms neutral) via the existing endpoint and saved to history.
 // Runs sequentially to stay gentle on the model; no backend change is required.
 function BatchScreen() {
+  const { t } = useT();
   const [files, setFiles] = useState([]);
   const [results, setResults] = useState([]);
   const [running, setRunning] = useState(false);
@@ -80,7 +82,7 @@ function BatchScreen() {
           ohi: r.ohi?.ohi,
           band: r.ohi?.band,
           colour: r.ohi?.colour,
-          top: (r.disease?.top_class || "—").replace(/_/g, " "),
+          top: (r.disease?.top_class || "\u2014").replace(/_/g, " "),
           conf: r.disease?.probabilities ? Math.max(...Object.values(r.disease.probabilities)) : null,
           mock: !!r.disease?.is_mock,
         });
@@ -95,37 +97,37 @@ function BatchScreen() {
 
   return (
     <section className="card batch-card">
-      <div className="card-head"><span className="eyebrow">Batch</span><h3>Batch screening</h3></div>
+      <div className="card-head"><span className="eyebrow">{t("batch.eyebrow")}</span><h3>{t("batch.title")}</h3></div>
       <p className="muted small" style={{ marginBottom: 14 }}>
-        Screen several fundus images at once. Each is scored on the image alone (symptoms neutral) and saved to history.
+        {t("batch.intro")}
       </p>
       <input ref={inputRef} type="file" accept="image/*" multiple style={{ display: "none" }} onChange={pick} />
       <div className="batch-controls">
         <button type="button" className="btn btn-ghost" onClick={() => inputRef.current?.click()} disabled={running}>
-          {files.length ? `${files.length} image${files.length > 1 ? "s" : ""} selected` : "Select fundus images"}
+          {files.length ? `${files.length} ${t("batch.imagesSelected")}` : t("batch.select")}
         </button>
         <button type="button" className="btn btn-primary" onClick={runAll} disabled={running || !files.length}>
-          {running ? `Screening ${progress}/${files.length}…` : "Screen all"}
+          {running ? `${progress}/${files.length}\u2026` : t("batch.screenAll")}
         </button>
       </div>
       {results.length > 0 && (
         <div className="batch-table">
           <div className="batch-head">
-            <span>File</span><span>OHI</span><span>Risk</span><span>Top finding</span><span>Conf.</span>
+            <span>{t("batch.colFile")}</span><span>{t("batch.colOhi")}</span><span>{t("batch.colRisk")}</span><span>{t("batch.colTop")}</span><span>{t("batch.colConf")}</span>
           </div>
           {results.map((r, i) => (
             <div className="batch-row" key={i}>
               <span className="batch-file" title={r.name}>{r.name}</span>
               {r.error ? (
-                <span className="batch-err" style={{ gridColumn: "2 / 6" }}>Failed: {r.error}</span>
+                <span className="batch-err" style={{ gridColumn: "2 / 6" }}>{t("batch.failed")}: {r.error}</span>
               ) : (
                 <>
                   <span className="mono" style={{ color: COLOURS[r.colour] || "var(--fg)" }}>
-                    {r.ohi == null ? "—" : Math.round(r.ohi)}
+                    {r.ohi == null ? "\u2014" : Math.round(r.ohi)}
                   </span>
-                  <span className="batch-band">{r.band || "—"}</span>
+                  <span className="batch-band">{r.band || "\u2014"}</span>
                   <span className="batch-top">{r.top}{r.mock && <span className="mock-tag">mock</span>}</span>
-                  <span className="mono small">{r.conf == null ? "—" : `${(r.conf * 100).toFixed(0)}%`}</span>
+                  <span className="mono small">{r.conf == null ? "\u2014" : `${(r.conf * 100).toFixed(0)}%`}</span>
                 </>
               )}
             </div>
@@ -137,6 +139,7 @@ function BatchScreen() {
 }
 
 export default function Screening({ isMock }) {
+  const { t } = useT();
   const fileInputRef = useRef(null);
   const [symptoms, setSymptoms] = useState({ pain: 1, redness: 1, photophobia: 1, blurred_vision: 1 });
   const [imageFile, setImageFile] = useState(null);
@@ -149,6 +152,7 @@ export default function Screening({ isMock }) {
   const [gradcamClass, setGradcamClass] = useState(null);
   const [fundusWarn, setFundusWarn] = useState(null);
   const [ackNonFundus, setAckNonFundus] = useState(false);
+  const [imgWarning, setImgWarning] = useState(false); // image does not look like a fundus photo
 
   const explain = useCallback(async (className) => {
     if (!imageFile) return;
@@ -208,36 +212,36 @@ export default function Screening({ isMock }) {
   return (
     <main className="se-wrap page">
       <div className="page-head">
-        <span className="eyebrow">Screening</span>
-        <h1 className="page-h">Disease screening &amp; Ocular Health Index</h1>
-        <p className="lead">Upload a fundus image and rate your symptoms. The server fuses both into a fuzzy-logic risk score.</p>
+        <span className="eyebrow">{t("screen.eyebrow")}</span>
+        <h1 className="page-h">{t("screen.title")}</h1>
+        <p className="lead">{t("screen.lead")}</p>
       </div>
 
       <Banners isMock={isMock} error={error} />
 
       <div className="screen-grid">
         <section className="card">
-          <div className="card-head"><span className="eyebrow">Step 1</span><h3>Screening inputs</h3></div>
+          <div className="card-head"><span className="eyebrow">{t("screen.step1")}</span><h3>{t("screen.inputs")}</h3></div>
           <Dropzone preview={preview} onSelect={selectImage} inputRef={fileInputRef} />
           <WebcamCapture onCapture={selectImage} />
-          <div className="form-sec">Symptom survey · 1 (none) – 5 (severe)</div>
+          <div className="form-sec">{t("screen.symptomSurvey")}</div>
           {SYMPTOMS.map((s) => (
-            <LikertRow key={s.key} label={s.label} value={symptoms[s.key]} onChange={(n) => setSymptom(s.key, n)} />
+            <LikertRow key={s.key} label={t(`symptom.${s.key}`)} value={symptoms[s.key]} onChange={(n) => setSymptom(s.key, n)} />
           ))}
           {fundusWarn && (
             <div className="fundus-warn">
               <p>{fundusWarn}</p>
               <label className="fundus-ack">
                 <input type="checkbox" checked={ackNonFundus} onChange={(e) => setAckNonFundus(e.target.checked)} />
-                <span>I understand. Screen this image anyway.</span>
+                <span>{t("screen.fundusAck")}</span>
               </label>
             </div>
           )}
           <button className="btn btn-primary btn-run" onClick={run} disabled={scoring || (!!fundusWarn && !ackNonFundus)}>
-            {scoring ? "Scoring…" : "Run screening →"}
+            {scoring ? t("screen.scoring") : t("screen.runArrow")}
           </button>
           <p className="muted small" style={{ marginTop: 10 }}>
-            No image? You'll still get an OHI from symptoms alone — disease screening is simply skipped.
+            {t("screen.noImageHint")}
           </p>
         </section>
 
@@ -245,47 +249,47 @@ export default function Screening({ isMock }) {
           {!result ? (
             <div className="result-ghost">
               <div className="ghost-ring"><span>OHI</span></div>
-              <p>Run a screening to generate your Ocular Health Index, class probabilities, and triage recommendation.</p>
+              <p>{t("screen.ghostText")}</p>
             </div>
           ) : (
             <div className="result-live">
               <div className="card-head">
-                <span className="eyebrow">Result</span><h3>Ocular Health Index</h3>
+                <span className="eyebrow">{t("screen.resultEyebrow")}</span><h3>{t("screen.resultTitle")}</h3>
                 {typeof result.latency_ms === "number" && <span className="muted small mono">{result.latency_ms} ms</span>}
               </div>
               {result.disease?.is_mock && (
-                <div className="mock-strip inline">Mock model — placeholder probabilities, not a screening result.</div>
+                <div className="mock-strip inline">{t("screen.mockStrip")}</div>
               )}
               <div className="result-grid">
                 <OHIGauge ohi={result.ohi?.ohi} band={result.ohi?.band} colour={result.ohi?.colour} />
                 <div className="result-detail">
-                  <div className="sub-lbl">Disease probabilities</div>
+                  <div className="sub-lbl">{t("screen.diseaseProbs")}</div>
                   <ClassBars probabilities={result.disease?.probabilities} topClass={result.disease?.top_class} />
                   {showLowConf && (
                     <div className="lowconf-note">
-                      ⚠ Low model confidence ({(topConf * 100).toFixed(0)}%). This result is uncertain — treat it with extra caution and prioritise professional review.
+                      ⚠ {t("screen.lowConf")} ({(topConf * 100).toFixed(0)}%). {t("screen.lowConfTail")}
                     </div>
                   )}
-                  <div className="sub-lbl">Recommended next steps</div>
+                  <div className="sub-lbl">{t("screen.recSteps")}</div>
                   <ul className="actions">
                     {(result.recommendation?.actions || []).map((a, i) => <li key={i}>{a}</li>)}
                   </ul>
                 </div>
               </div>
               <div className="result-actions">
-                <button className="btn btn-ghost" onClick={() => window.print()}>Export / print report</button>
+                <button className="btn btn-ghost" onClick={() => window.print()}>{t("screen.export")}</button>
                 {imageFile && result.disease && result.disease.is_mock === false && (
                   <button className="btn btn-ghost" onClick={() => explain()} disabled={explaining}>
-                    {explaining ? "Generating…" : "Explain prediction"}
+                    {explaining ? t("screen.generating") : t("screen.explain")}
                   </button>
                 )}
                 {result.session_id != null
-                  ? <span className="muted small">Saved to history · #{result.session_id}</span>
-                  : <span className="muted small">Sign in to save this result to your history.</span>}
+                  ? <span className="muted small">{t("screen.savedHist")} · #{result.session_id}</span>
+                  : <span className="muted small">{t("screen.signInSave")}</span>}
               </div>
               {gradcam && (
                 <div className="gradcam-panel">
-                  <div className="sub-lbl">Grad-CAM — where the model looked</div>
+                  <div className="sub-lbl">{t("screen.gradcamTitle")}</div>
                   {result.disease?.probabilities && (
                     <div className="gradcam-classes">
                       {Object.keys(result.disease.probabilities).map((cls) => (
@@ -296,15 +300,14 @@ export default function Screening({ isMock }) {
                           onClick={() => explain(cls)}
                           disabled={explaining}
                         >
-                          {cls.replace(/_/g, " ")}
+                          {t(`class.${cls}`)}
                         </button>
                       ))}
                     </div>
                   )}
                   <img src={gradcam} alt="Grad-CAM heatmap overlay" className="gradcam-img" />
                   <p className="muted small">
-                    {gradcamClass ? `Showing: ${gradcamClass.replace(/_/g, " ")}. ` : ""}Warm regions show the areas of the fundus that most influenced the prediction
-                    (ResNet branch). This is an explainability aid, not a diagnostic marker.
+                    {gradcamClass ? `${t("screen.showing")}: ${t(`class.${gradcamClass}`)}. ` : ""}{t("screen.gradcamCaption")}
                   </p>
                 </div>
               )}
