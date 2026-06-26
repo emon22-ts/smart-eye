@@ -297,9 +297,20 @@ export const STYLES = `
 
 /* Print / export report */
 @media print{
-  .backdrop,.se-nav,.se-footer,.hero-btns,.result-actions,.disc-in,.cam-controls{display:none!important}
-  .se-app{background:#fff;color:#000}
-  .card{border:1px solid #ccc;box-shadow:none;background:#fff}
+  @page{margin:14mm}
+  .backdrop,.se-nav,.se-footer,.hero-btns,.result-actions,.disc-in,.cam-controls,
+  .page-head,.batch-card,.gradcam-classes,.result-ghost{display:none!important}
+  .screen-grid>.card:first-child{display:none!important}
+  .screen-grid{display:block!important;gap:0!important}
+  .se-app{background:#fff!important;color:#0F172A}
+  .se-wrap.page{padding:0!important;max-width:100%!important;margin:0!important}
+  .card{border:none!important;box-shadow:none!important;background:#fff!important;padding:0!important}
+  .result-live .eyebrow{display:none!important}
+  .result-live .card-head .mono{display:none!important}
+  .result-live::before{content:"Smart Eye — Ocular Health Report";display:block;font-size:20px;font-weight:600;letter-spacing:-.01em;color:#0F172A;padding-bottom:10px;margin-bottom:18px;border-bottom:2px solid #0F172A}
+  .result-grid{break-inside:avoid}
+  .gradcam-panel{break-inside:avoid;margin-top:18px}
+  .gradcam-img{max-width:240px}
   .mock-strip,.err-strip{border:1px solid #c00;color:#c00;background:#fff}
 }
 

@@ -9,7 +9,7 @@ try:
 except ImportError:
     _HAVE_FPDF = False
 
-def generate_pdf(summary, session_id, output_path):
+def generate_pdf(summary, session_id, output_path, gradcam_b64=None):
     if not _HAVE_FPDF:
         raise RuntimeError("fpdf2 not installed")
     disease = summary.get("disease", {})
@@ -114,6 +114,25 @@ def generate_pdf(summary, session_id, output_path):
     pdf.set_font("Helvetica", "", 10)
     for i, action in enumerate(actions, 1):
         pdf.multi_cell(0, 6, f"{i}. {action}", ln=True)
+    if gradcam_b64:
+        try:
+            import base64, tempfile
+            _b64 = gradcam_b64.split(",", 1)[-1]
+            _tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
+            _tmp.write(base64.b64decode(_b64))
+            _tmp.close()
+            pdf.ln(3)
+            pdf.set_font("Helvetica", "B", 11)
+            pdf.set_fill_color(240, 240, 240)
+            pdf.cell(0, 7, "  6. Grad-CAM Explainability", ln=True, fill=True)
+            pdf.ln(2)
+            pdf.image(_tmp.name, w=70)
+            pdf.set_font("Helvetica", "I", 8)
+            pdf.set_text_color(120, 120, 120)
+            pdf.multi_cell(0, 5, "Warm regions show where the model attended (ResNet branch). Explainability aid, not a diagnostic marker.")
+            pdf.set_text_color(0, 0, 0)
+        except Exception:
+            pass
     pdf.set_y(-15)
     pdf.set_font("Helvetica", "I", 8)
     pdf.set_text_color(130,130,130)

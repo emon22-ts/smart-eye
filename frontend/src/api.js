@@ -104,3 +104,16 @@ export function deleteSession(id) {
     headers: { ...authHeader() },
   }).then(asJson);
 }
+
+export async function downloadSessionPdf(id) {
+  const res = await fetch(`${API_BASE}/api/sessions/${id}/pdf`, { headers: { ...authHeader() } });
+  if (!res.ok) {
+    let detail = "";
+    try { const b = await res.json(); detail = b.error || b.detail || ""; } catch { /* non-JSON */ }
+    throw new Error(detail || `server responded ${res.status}`);
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+  setTimeout(() => URL.revokeObjectURL(url), 15000);
+}

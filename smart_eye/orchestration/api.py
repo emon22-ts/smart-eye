@@ -207,6 +207,16 @@ async def session_score(
         payload["session_id"] = store.save_session(payload, user_id=uid)
     except Exception:
         payload["session_id"] = None  # never let a storage hiccup fail the screening
+    try:
+        import os as _os
+        _sid = payload.get("session_id")
+        if _sid is not None and file is not None and raw:
+            _d = _os.path.join(_os.path.dirname(__file__), "..", "persistence", "session_images")
+            _os.makedirs(_d, exist_ok=True)
+            with open(_os.path.join(_d, f"{_sid}.png"), "wb") as _f:
+                _f.write(raw)
+    except Exception:
+        pass
 
     return JSONResponse(payload)
 
@@ -418,7 +428,18 @@ async def export_session_pdf(
 
     tmp_path = f"/tmp/smart_eye_report_{session_id}.pdf"
     try:
-        generate_pdf(payload, session_id=session_id, output_path=tmp_path)
+        _gradcam_b64 = None
+        try:
+            import os as _os, numpy as _np
+            from PIL import Image as _Image
+            _img_path = _os.path.join(_os.path.dirname(__file__), "..", "persistence", "session_images", f"{session_id}.png")
+            if _os.path.exists(_img_path):
+                from ..domain.gradcam import explain_image as _explain
+                _arr = _np.asarray(_Image.open(_img_path).convert("RGB"))
+                _gradcam_b64 = _explain(_MODEL, _arr)
+        except Exception:
+            _gradcam_b64 = None
+        generate_pdf(payload, session_id=session_id, output_path=tmp_path, gradcam_b64=_gradcam_b64)
     except Exception as exc:
         return JSONResponse(status_code=500, content={"error": f"PDF generation failed: {exc}"})
 
