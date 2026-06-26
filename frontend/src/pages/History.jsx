@@ -1,6 +1,7 @@
 // Session history — lists persisted screenings from /api/sessions (real backend).
 // Adds an OHI trend line, a fatigue column, and CSV export of all sessions.
 import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { listSessions, deleteSession } from "../api";
 import { COLOURS } from "../constants";
 import { Met } from "../components";
@@ -86,8 +87,11 @@ function CompareSessions({ rows }) {
 export default function History() {
   const [rows, setRows] = useState(null);
   const [error, setError] = useState(null);
+  const isGuest = typeof localStorage === "undefined" || localStorage.getItem("se_token") == null;
+  const nav = useNavigate();
 
   const load = useCallback(async () => {
+    if (isGuest) { setRows([]); return; }
     setError(null);
     try {
       setRows(await listSessions());
@@ -95,7 +99,7 @@ export default function History() {
       setError(`Could not load history: ${e.message}`);
       setRows([]);
     }
-  }, []);
+  }, [isGuest]);
   useEffect(() => { load(); }, [load]);
 
   const remove = async (id) => {
@@ -168,6 +172,24 @@ export default function History() {
     if (delta > 1) { trendArrow = " ↑"; trendColour = "var(--success)"; }
     else if (delta < -1) { trendArrow = " ↓"; trendColour = "var(--danger)"; }
     else { trendArrow = " →"; }
+  }
+
+  if (isGuest) {
+    return (
+      <main className="se-wrap page">
+        <div className="page-head">
+          <span className="eyebrow">History</span>
+          <h1 className="page-h">Session history</h1>
+        </div>
+        <section className="card" style={{ textAlign: "center", padding: "48px 24px" }}>
+          <h3 style={{ marginBottom: 8 }}>Sign in to save your history</h3>
+          <p className="muted" style={{ marginBottom: 20, maxWidth: 420, marginLeft: "auto", marginRight: "auto" }}>
+            Your screenings are saved privately to your account. Sign in to keep a history you can revisit and export.
+          </p>
+          <button className="btn btn-primary" onClick={() => nav("/login")}>Sign in</button>
+        </section>
+      </main>
+    );
   }
 
   return (

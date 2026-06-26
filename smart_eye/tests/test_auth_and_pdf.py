@@ -61,16 +61,23 @@ async def test_register_login_me_flow():
 
 
 async def test_score_then_pdf_download():
+    email = "pdf_" + uuid.uuid4().hex[:10] + "@example.com"
     async with _client() as ac:
+        r = await ac.post("/api/auth/register", json={"email": email, "password": "TestPass123!", "name": "PDF User"})
+        assert r.status_code == 200, "register failed: " + str(r.status_code) + " " + r.text
+        tok = r.json().get("access_token") or r.json().get("token")
+        assert tok, "no token on register"
+        headers = {"Authorization": "Bearer " + tok}
+
         r = await ac.post("/api/session/score", params={
             "pain": 3, "redness": 2, "photophobia": 1, "blurred_vision": 2,
             "fatigue_score": 10, "drowsy": "false", "blink_rate_bpm": 15,
-        })
+        }, headers=headers)
         assert r.status_code == 200, "score failed: " + str(r.status_code) + " " + r.text
         sid = r.json().get("session_id")
-        assert sid is not None, "no session_id: " + str(r.json())
+        assert sid is not None, "no session_id (signed-in should persist): " + str(r.json())
 
-        r = await ac.get("/api/sessions/" + str(sid) + "/pdf")
+        r = await ac.get("/api/sessions/" + str(sid) + "/pdf", headers=headers)
         assert r.status_code == 200, "pdf failed: " + str(r.status_code) + " " + r.text
         ctype = r.headers.get("content-type", "")
         assert "pdf" in ctype.lower(), "unexpected content-type: " + ctype

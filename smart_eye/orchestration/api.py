@@ -201,12 +201,15 @@ async def session_score(
         if hasattr(obj, "dict"):
             payload[key] = obj.dict()
 
-    # Persist the session (tagged with the user if signed in, else anonymous).
-    try:
-        uid = auth.user_id_from_header(authorization)
-        payload["session_id"] = store.save_session(payload, user_id=uid)
-    except Exception:
-        payload["session_id"] = None  # never let a storage hiccup fail the screening
+    # Persist the session ONLY for signed-in users. Guests get no saved history
+    # (so nobody shares an anonymous bucket); they still see their live result.
+    payload["session_id"] = None
+    uid = auth.user_id_from_header(authorization)
+    if uid is not None:
+        try:
+            payload["session_id"] = store.save_session(payload, user_id=uid)
+        except Exception:
+            payload["session_id"] = None  # never let a storage hiccup fail the screening
     try:
         import os as _os
         _sid = payload.get("session_id")
@@ -225,6 +228,8 @@ async def session_score(
 def list_sessions(limit: int = 100, authorization: Optional[str] = Header(None)) -> JSONResponse:
     """Recent sessions for the signed-in user (or the anonymous bucket for guests)."""
     uid = auth.user_id_from_header(authorization)
+    if uid is None:
+        return JSONResponse([])  # history requires an account; no shared guest bucket
     return JSONResponse(store.list_sessions(limit, user_id=uid))
 
 
@@ -232,6 +237,8 @@ def list_sessions(limit: int = 100, authorization: Optional[str] = Header(None))
 def get_session(session_id: int, authorization: Optional[str] = Header(None)) -> JSONResponse:
     """Full stored SessionSummary for one id (scoped to the caller)."""
     uid = auth.user_id_from_header(authorization)
+    if uid is None:
+        return JSONResponse(status_code=401, content={"error": "sign in to view session history"})
     record = store.get_session(session_id, user_id=uid)
     if record is None:
         return JSONResponse(status_code=404, content={"error": "session not found"})
@@ -242,6 +249,8 @@ def get_session(session_id: int, authorization: Optional[str] = Header(None)) ->
 def delete_session(session_id: int, authorization: Optional[str] = Header(None)) -> JSONResponse:
     """Remove one of the caller's sessions from history."""
     uid = auth.user_id_from_header(authorization)
+    if uid is None:
+        return JSONResponse(status_code=401, content={"error": "sign in to manage history"})
     return JSONResponse({"deleted": store.delete_session(session_id, user_id=uid)})
 
 
@@ -415,6 +424,8 @@ async def export_session_pdf(
     from ..domain.report_generator import generate_pdf
 
     uid = auth.user_id_from_header(authorization)
+    if uid is None:
+        return JSONResponse(status_code=401, content={"error": "sign in to export a report"})
     record = store.get_session(session_id, user_id=uid)
     if record is None:
         return JSONResponse(status_code=404, content={"error": "session not found"})

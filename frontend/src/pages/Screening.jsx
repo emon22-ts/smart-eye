@@ -279,7 +279,9 @@ export default function Screening({ isMock }) {
                     {explaining ? "Generating…" : "Explain prediction"}
                   </button>
                 )}
-                {result.session_id != null && <span className="muted small">Saved to history · #{result.session_id}</span>}
+                {result.session_id != null
+                  ? <span className="muted small">Saved to history · #{result.session_id}</span>
+                  : <span className="muted small">Sign in to save this result to your history.</span>}
               </div>
               {gradcam && (
                 <div className="gradcam-panel">
