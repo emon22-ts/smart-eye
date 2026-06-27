@@ -421,6 +421,33 @@ export const STYLES = `
 .an-risk-legend i{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
 .an-trend-svg{width:100%;height:90px;display:block}
 @media(prefers-reduced-motion:reduce){.an-bar i{animation:none}}
+
+/* Help & Education page */
+.help-cond-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:680px){.help-cond-grid{grid-template-columns:1fr}}
+.help-cond{padding:18px;border:1px solid var(--border-2);border-radius:14px;background:var(--card-2);
+  transition:transform .2s ease, border-color .2s ease}
+.help-cond:hover{transform:translateY(-3px);border-color:var(--primary)}
+.help-cond-name{margin:0 0 8px;font-size:17px;color:var(--primary)}
+.help-cond-what{margin:0 0 14px;font-size:13.5px;line-height:1.5;color:var(--fg)}
+.help-cond-meta{display:flex;flex-direction:column;gap:2px;margin-top:10px;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.help-meta-lbl{font-weight:600;color:var(--fg);text-transform:uppercase;letter-spacing:.4px;font-size:10.5px}
+.help-tips{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:680px){.help-tips{grid-template-columns:1fr}}
+.help-tip{display:flex;gap:11px;align-items:flex-start}
+.help-tip-dot{flex:0 0 auto;width:8px;height:8px;margin-top:6px;border-radius:50%;
+  background:var(--success);box-shadow:0 0 0 4px rgba(34,197,94,.14)}
+.help-tip b{display:block;margin-bottom:3px;font-size:14px}
+.help-tip p{margin:0;line-height:1.45}
+.help-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+@media(max-width:680px){.help-steps{grid-template-columns:1fr}}
+.help-step{padding:14px;border-radius:12px;background:var(--card-2);border:1px solid var(--border-2)}
+.help-step b{display:block;margin-bottom:5px;color:var(--primary);font-size:14px}
+.help-step p{margin:0;line-height:1.45}
+.help-how-result{font-size:13.5px;line-height:1.55;color:var(--fg);margin:0 0 16px;padding:14px;
+  border-left:3px solid var(--primary);background:rgba(59,130,246,.06);border-radius:0 8px 8px 0}
+.help-disclaimer{font-size:12px;line-height:1.5;color:var(--muted);text-align:center;
+  max-width:640px;margin:8px auto 0;padding:0 16px}
 @media(max-width:480px){.sdm{padding:22px 18px}.sdm-h{font-size:19px}}
 
 /* ---- Mobile polish (augments existing breakpoints) ---- */

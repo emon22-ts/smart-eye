@@ -12,6 +12,7 @@ import Screening from "./pages/Screening.jsx";
 import Fatigue from "./pages/Fatigue.jsx";
 import History from "./pages/History.jsx";
 import Analytics from "./pages/Analytics.jsx";
+import Help from "./pages/Help.jsx";
 import Login from "./pages/Login.jsx";
 
 // Catches render-time errors anywhere below it, so one thrown error shows a
@@ -56,6 +57,7 @@ function Shell({ isMock, theme, onToggleTheme, isAuthed }) {
         <Route path="/fatigue" element={<Fatigue />} />
         <Route path="/history" element={<History />} />
         <Route path="/analytics" element={<Analytics />} />
+        <Route path="/help" element={<Help />} />
         <Route path="/login" element={isAuthed ? <Navigate to="/" replace /> : <Login />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

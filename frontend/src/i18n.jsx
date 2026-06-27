@@ -20,6 +20,7 @@ const DICT = {
   "nav.fatigue":        { en: "Fatigue", bn: "ক্লান্তি" },
   "nav.history":        { en: "History", bn: "ইতিহাস" },
   "nav.analytics":      { en: "Analytics", bn: "বিশ্লেষণ" },
+  "nav.help":           { en: "Help", bn: "সাহায্য" },
   "nav.signIn":         { en: "Sign in", bn: "সাইন ইন" },
   "nav.signOut":        { en: "Sign out", bn: "সাইন আউট" },
 
@@ -291,6 +292,61 @@ const DICT = {
   "an.trendSub":        { en: "Oldest to newest — higher is healthier", bn: "পুরোনো থেকে নতুন — বেশি হলে স্বাস্থ্যকর" },
   "an.noFinding":       { en: "No findings recorded yet.", bn: "এখনো কোনো ফলাফল রেকর্ড করা হয়নি।" },
   "an.scans":           { en: "scans", bn: "স্ক্যান" },
+
+  // ---- help & education page ----
+  "help.eyebrow":       { en: "Help & Education", bn: "সাহায্য ও শিক্ষা" },
+  "help.title":         { en: "Understanding eye health", bn: "চোখের স্বাস্থ্য বোঝা" },
+  "help.lead":          { en: "Learn about the conditions Smart Eye screens for, how to protect your vision, and how the screening works. This is educational information, not a medical diagnosis.", bn: "Smart Eye যে অবস্থাগুলি স্ক্রিন করে সেগুলি সম্পর্কে জানুন, কীভাবে আপনার দৃষ্টি রক্ষা করবেন এবং স্ক্রিনিং কীভাবে কাজ করে। এটি শিক্ষামূলক তথ্য, কোনো চিকিৎসা রোগনির্ণয় নয়।" },
+  "help.condTitle":     { en: "Conditions we screen for", bn: "যে অবস্থাগুলি আমরা স্ক্রিন করি" },
+  "help.symptomsLabel": { en: "Common signs", bn: "সাধারণ লক্ষণ" },
+  "help.riskLabel":     { en: "Who's at risk", bn: "কারা ঝুঁকিতে" },
+
+  "help.normal.name":   { en: "Normal", bn: "নরমাল" },
+  "help.normal.what":   { en: "A healthy retina with no signs of the conditions below. Regular screening still matters — many eye diseases develop silently before symptoms appear.", bn: "নিচের অবস্থাগুলির কোনো লক্ষণ ছাড়াই একটি সুস্থ রেটিনা। নিয়মিত স্ক্রিনিং তবুও গুরুত্বপূর্ণ — অনেক চোখের রোগ লক্ষণ দেখা দেওয়ার আগে নীরবে বিকশিত হয়।" },
+  "help.normal.signs":  { en: "Clear vision, no pain, no distortion or dark spots.", bn: "পরিষ্কার দৃষ্টি, ব্যথা নেই, কোনো বিকৃতি বা কালো দাগ নেই।" },
+  "help.normal.risk":   { en: "Everyone benefits from periodic eye checks, especially after age 40.", bn: "সবাই পর্যায়ক্রমিক চোখ পরীক্ষা থেকে উপকৃত হয়, বিশেষত ৪০ বছর বয়সের পরে।" },
+
+  "help.cataract.name": { en: "Cataract", bn: "ছানি" },
+  "help.cataract.what": { en: "A clouding of the eye's natural lens that gradually blurs vision. It's very common with age and is treatable with a routine surgical procedure.", bn: "চোখের প্রাকৃতিক লেন্সের একটি মেঘাচ্ছন্নতা যা ধীরে ধীরে দৃষ্টি ঝাপসা করে। এটি বয়সের সাথে খুব সাধারণ এবং একটি রুটিন অস্ত্রোপচারের মাধ্যমে চিকিৎসাযোগ্য।" },
+  "help.cataract.signs": { en: "Blurry or cloudy vision, faded colours, glare or halos around lights, poor night vision.", bn: "ঝাপসা বা মেঘাচ্ছন্ন দৃষ্টি, বিবর্ণ রং, আলোর চারপাশে ঝলক বা আলোকবলয়, দুর্বল রাতের দৃষ্টি।" },
+  "help.cataract.risk": { en: "Older adults, diabetes, prolonged UV exposure, smoking, and some medications.", bn: "বয়স্ক ব্যক্তি, ডায়াবেটিস, দীর্ঘস্থায়ী UV সংস্পর্শ, ধূমপান এবং কিছু ওষুধ।" },
+
+  "help.glaucoma.name": { en: "Glaucoma", bn: "গ্লুকোমা" },
+  "help.glaucoma.what": { en: "Damage to the optic nerve, often from raised pressure inside the eye. It can slowly steal peripheral vision and is a leading cause of irreversible blindness — but early detection helps protect sight.", bn: "অপটিক স্নায়ুর ক্ষতি, প্রায়শই চোখের ভিতরে বর্ধিত চাপ থেকে। এটি ধীরে ধীরে পার্শ্বীয় দৃষ্টি কেড়ে নিতে পারে এবং অপরিবর্তনীয় অন্ধত্বের একটি প্রধান কারণ — তবে প্রাথমিক সনাক্তকরণ দৃষ্টি রক্ষায় সাহায্য করে।" },
+  "help.glaucoma.signs": { en: "Often none early on. Later: loss of side vision, tunnel vision; rarely eye pain and redness in acute cases.", bn: "প্রায়শই প্রথম দিকে কোনোটিই নয়। পরে: পাশের দৃষ্টি হারানো, টানেল দৃষ্টি; বিরল ক্ষেত্রে তীব্র অবস্থায় চোখে ব্যথা ও লালভাব।" },
+  "help.glaucoma.risk": { en: "Family history, age over 60, high eye pressure, diabetes, and certain ethnic backgrounds.", bn: "পারিবারিক ইতিহাস, ৬০-এর বেশি বয়স, উচ্চ চোখের চাপ, ডায়াবেটিস এবং নির্দিষ্ট জাতিগত পটভূমি।" },
+
+  "help.dr.name":       { en: "Diabetic Retinopathy", bn: "ডায়াবেটিক রেটিনোপ্যাথি" },
+  "help.dr.what":       { en: "Damage to the retina's blood vessels caused by diabetes. High blood sugar over time can cause leaking, swelling, and new fragile vessels. Managing blood sugar and regular screening are key to preventing vision loss.", bn: "ডায়াবেটিসের কারণে রেটিনার রক্তনালীর ক্ষতি। সময়ের সাথে উচ্চ রক্তে শর্করা ফুটো, ফোলাভাব এবং নতুন ভঙ্গুর নালী সৃষ্টি করতে পারে। রক্তে শর্করা নিয়ন্ত্রণ ও নিয়মিত স্ক্রিনিং দৃষ্টিশক্তি হ্রাস রোধের চাবিকাঠি।" },
+  "help.dr.signs":      { en: "Early: often none. Later: floaters, blurred or fluctuating vision, dark areas, impaired colour vision.", bn: "প্রথম দিকে: প্রায়শই কোনোটিই নয়। পরে: ভাসমান বস্তু, ঝাপসা বা ওঠানামা করা দৃষ্টি, কালো এলাকা, প্রতিবন্ধী রং দৃষ্টি।" },
+  "help.dr.risk":       { en: "Anyone with type 1 or type 2 diabetes, especially with long duration or poor blood-sugar control.", bn: "টাইপ ১ বা টাইপ ২ ডায়াবেটিসে আক্রান্ত যে কেউ, বিশেষত দীর্ঘ সময়কাল বা দুর্বল রক্তে শর্করা নিয়ন্ত্রণের সাথে।" },
+
+  "help.preventTitle":  { en: "Protecting your vision", bn: "আপনার দৃষ্টি রক্ষা করা" },
+  "help.preventSub":    { en: "Simple habits that help keep your eyes healthy", bn: "সহজ অভ্যাস যা আপনার চোখ সুস্থ রাখতে সাহায্য করে" },
+  "help.tip1.t":        { en: "Get regular eye exams", bn: "নিয়মিত চোখ পরীক্ষা করান" },
+  "help.tip1.d":        { en: "A comprehensive exam can catch silent diseases early — every 1–2 years, or as your doctor advises.", bn: "একটি ব্যাপক পরীক্ষা নীরব রোগ প্রাথমিকভাবে ধরতে পারে — প্রতি ১–২ বছরে, বা আপনার ডাক্তারের পরামর্শ অনুযায়ী।" },
+  "help.tip2.t":        { en: "Manage diabetes & blood pressure", bn: "ডায়াবেটিস ও রক্তচাপ নিয়ন্ত্রণ করুন" },
+  "help.tip2.d":        { en: "Keeping blood sugar and pressure in range protects the delicate vessels in your retina.", bn: "রক্তে শর্করা ও চাপ সীমার মধ্যে রাখা আপনার রেটিনার সূক্ষ্ম নালীগুলিকে রক্ষা করে।" },
+  "help.tip3.t":        { en: "Protect against UV light", bn: "UV আলো থেকে রক্ষা করুন" },
+  "help.tip3.d":        { en: "Wear sunglasses that block UVA/UVB outdoors to lower cataract and retinal risk.", bn: "ছানি ও রেটিনার ঝুঁকি কমাতে বাইরে UVA/UVB ব্লক করে এমন সানগ্লাস পরুন।" },
+  "help.tip4.t":        { en: "Rest your eyes from screens", bn: "স্ক্রিন থেকে চোখকে বিশ্রাম দিন" },
+  "help.tip4.d":        { en: "Follow the 20-20-20 rule: every 20 minutes, look 20 feet away for 20 seconds.", bn: "২০-২০-২০ নিয়ম মেনে চলুন: প্রতি ২০ মিনিটে, ২০ সেকেন্ডের জন্য ২০ ফুট দূরে তাকান।" },
+  "help.tip5.t":        { en: "Eat for eye health", bn: "চোখের স্বাস্থ্যের জন্য খান" },
+  "help.tip5.d":        { en: "Leafy greens, fish rich in omega-3, and colourful fruits support long-term eye health.", bn: "শাকসবজি, ওমেগা-৩ সমৃদ্ধ মাছ এবং রঙিন ফল দীর্ঘমেয়াদী চোখের স্বাস্থ্যকে সমর্থন করে।" },
+  "help.tip6.t":        { en: "Don't smoke", bn: "ধূমপান করবেন না" },
+  "help.tip6.d":        { en: "Smoking raises the risk of cataract, macular damage, and optic-nerve problems.", bn: "ধূমপান ছানি, ম্যাকুলার ক্ষতি এবং অপটিক-স্নায়ুর সমস্যার ঝুঁকি বাড়ায়।" },
+
+  "help.howTitle":      { en: "How Smart Eye works", bn: "Smart Eye কীভাবে কাজ করে" },
+  "help.howSub":        { en: "Three inputs combined into one transparent score", bn: "তিনটি ইনপুট একটি স্বচ্ছ স্কোরে একত্রিত" },
+  "help.how1.t":        { en: "1 · Fundus image", bn: "১ · ফান্ডাস ছবি" },
+  "help.how1.d":        { en: "A retinal photo is analysed by a CNN that estimates the chance of each of the four conditions.", bn: "একটি রেটিনার ছবি একটি CNN দ্বারা বিশ্লেষণ করা হয় যা চারটি অবস্থার প্রতিটির সম্ভাবনা অনুমান করে।" },
+  "help.how2.t":        { en: "2 · Symptoms", bn: "২ · উপসর্গ" },
+  "help.how2.d":        { en: "You rate symptoms like pain, redness, and blurred vision to add real-world context.", bn: "আপনি ব্যথা, লালভাব এবং ঝাপসা দৃষ্টির মতো উপসর্গ মূল্যায়ন করেন বাস্তব প্রসঙ্গ যোগ করতে।" },
+  "help.how3.t":        { en: "3 · Fatigue (optional)", bn: "৩ · ক্লান্তি (ঐচ্ছিক)" },
+  "help.how3.d":        { en: "An optional webcam check measures eye-aspect-ratio and blink rate for a fatigue signal.", bn: "একটি ঐচ্ছিক ওয়েবক্যাম পরীক্ষা ক্লান্তির সংকেতের জন্য আই-অ্যাসপেক্ট-রেশিও ও ব্লিঙ্ক রেট পরিমাপ করে।" },
+  "help.howResult":     { en: "A fuzzy-logic engine fuses these into your Ocular Health Index (0–100) with a clear recommendation — every step is transparent and inspectable.", bn: "একটি ফাজি-লজিক ইঞ্জিন এগুলিকে আপনার চক্ষু স্বাস্থ্য সূচকে (০–১০০) একটি স্পষ্ট সুপারিশ সহ একত্রিত করে — প্রতিটি ধাপ স্বচ্ছ ও পরিদর্শনযোগ্য।" },
+  "help.ctaScreen":     { en: "Start a screening", bn: "একটি স্ক্রিনিং শুরু করুন" },
+  "help.disclaimer":    { en: "Smart Eye is a preliminary screening and triage support tool. It does not provide a clinical diagnosis. Always consult a qualified eye-care professional for medical concerns.", bn: "Smart Eye একটি প্রাথমিক স্ক্রিনিং ও ট্রায়াজ সহায়ক সরঞ্জাম। এটি কোনো ক্লিনিক্যাল রোগনির্ণয় প্রদান করে না। চিকিৎসা সংক্রান্ত উদ্বেগের জন্য সর্বদা একজন যোগ্য চক্ষু-বিশেষজ্ঞের পরামর্শ নিন।" },
 };
 
 const LangCtx = createContext({ lang: "en", t: (k) => k, setLang: () => {} });
