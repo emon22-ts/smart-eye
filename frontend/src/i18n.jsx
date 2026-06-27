@@ -19,6 +19,7 @@ const DICT = {
   "nav.screening":      { en: "Screening", bn: "স্ক্রিনিং" },
   "nav.fatigue":        { en: "Fatigue", bn: "ক্লান্তি" },
   "nav.history":        { en: "History", bn: "ইতিহাস" },
+  "nav.analytics":      { en: "Analytics", bn: "বিশ্লেষণ" },
   "nav.signIn":         { en: "Sign in", bn: "সাইন ইন" },
   "nav.signOut":        { en: "Sign out", bn: "সাইন আউট" },
 
@@ -271,6 +272,25 @@ const DICT = {
   "filter.showing":     { en: "Showing {n} of {c}", bn: "{c}টির মধ্যে {n}টি দেখানো হচ্ছে" },
   "filter.noMatch":     { en: "No sessions match your search.", bn: "আপনার অনুসন্ধানের সাথে কোনো সেশন মেলে না।" },
   "filter.clear":       { en: "Clear", bn: "মুছুন" },
+
+  // ---- analytics dashboard ----
+  "an.eyebrow":         { en: "Analytics", bn: "বিশ্লেষণ" },
+  "an.title":           { en: "Screening analytics", bn: "স্ক্রিনিং বিশ্লেষণ" },
+  "an.lead":            { en: "An overview of all your screenings — totals, disease distribution, and how your Ocular Health Index has trended.", bn: "আপনার সমস্ত স্ক্রিনিংয়ের একটি সংক্ষিপ্ত বিবরণ — মোট সংখ্যা, রোগ বণ্টন এবং আপনার চক্ষু স্বাস্থ্য সূচকের প্রবণতা।" },
+  "an.signInTitle":     { en: "Sign in to see your analytics", bn: "আপনার বিশ্লেষণ দেখতে সাইন ইন করুন" },
+  "an.signInBody":      { en: "Analytics are built from your saved screenings. Sign in to track totals and trends over time.", bn: "বিশ্লেষণ আপনার সংরক্ষিত স্ক্রিনিং থেকে তৈরি হয়। সময়ের সাথে মোট ও প্রবণতা ট্র্যাক করতে সাইন ইন করুন।" },
+  "an.empty":           { en: "No screenings yet — run a screening and your analytics will appear here.", bn: "এখনো কোনো স্ক্রিনিং নেই — একটি স্ক্রিনিং চালান এবং আপনার বিশ্লেষণ এখানে দেখা যাবে।" },
+  "an.statTotal":       { en: "Total screenings", bn: "মোট স্ক্রিনিং" },
+  "an.statAvg":         { en: "Average OHI", bn: "গড় OHI" },
+  "an.statHigh":        { en: "High-risk results", bn: "উচ্চ-ঝুঁকির ফলাফল" },
+  "an.statFatigue":     { en: "Average fatigue", bn: "গড় ক্লান্তি" },
+  "an.diseaseTitle":    { en: "Disease distribution", bn: "রোগ বণ্টন" },
+  "an.diseaseSub":      { en: "How often each class was the top finding", bn: "প্রতিটি শ্রেণি কতবার শীর্ষ ফলাফল ছিল" },
+  "an.riskTitle":       { en: "Risk breakdown", bn: "ঝুঁকি বিভাজন" },
+  "an.trendTitle":      { en: "OHI over time", bn: "সময়ের সাথে OHI" },
+  "an.trendSub":        { en: "Oldest to newest — higher is healthier", bn: "পুরোনো থেকে নতুন — বেশি হলে স্বাস্থ্যকর" },
+  "an.noFinding":       { en: "No findings recorded yet.", bn: "এখনো কোনো ফলাফল রেকর্ড করা হয়নি।" },
+  "an.scans":           { en: "scans", bn: "স্ক্যান" },
 };
 
 const LangCtx = createContext({ lang: "en", t: (k) => k, setLang: () => {} });

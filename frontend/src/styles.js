@@ -404,6 +404,23 @@ export const STYLES = `
 .hist-risk-select:focus{outline:none;border-color:var(--primary)}
 .hist-count{margin-left:auto;white-space:nowrap}
 @media(max-width:480px){.hist-count{margin-left:0;width:100%}}
+
+/* Analytics dashboard */
+.an-stats{margin-bottom:16px}
+.an-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+@media(max-width:760px){.an-grid{grid-template-columns:1fr}}
+.an-dist{display:flex;flex-direction:column;gap:13px}
+.an-dist-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;gap:10px}
+.an-bar{height:10px;border-radius:6px;background:var(--card-2);overflow:hidden}
+.an-bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#3b82f6,#7dd3fc);
+  transform-origin:left center;animation:se-bar-grow .8s cubic-bezier(.22,1,.36,1) both;animation-delay:.1s}
+.an-risk-bar{display:flex;height:34px;border-radius:10px;overflow:hidden;margin-bottom:14px;background:var(--card-2)}
+.an-risk-bar span{display:block;transition:flex .4s ease}
+.an-risk-legend{display:flex;flex-direction:column;gap:9px;font-size:13px}
+.an-risk-legend span{display:flex;align-items:center;gap:9px}
+.an-risk-legend i{width:11px;height:11px;border-radius:3px;flex:0 0 auto}
+.an-trend-svg{width:100%;height:90px;display:block}
+@media(prefers-reduced-motion:reduce){.an-bar i{animation:none}}
 @media(max-width:480px){.sdm{padding:22px 18px}.sdm-h{font-size:19px}}
 
 /* ---- Mobile polish (augments existing breakpoints) ---- */

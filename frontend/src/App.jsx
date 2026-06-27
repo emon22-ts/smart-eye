@@ -11,6 +11,7 @@ import Home from "./pages/Home.jsx";
 import Screening from "./pages/Screening.jsx";
 import Fatigue from "./pages/Fatigue.jsx";
 import History from "./pages/History.jsx";
+import Analytics from "./pages/Analytics.jsx";
 import Login from "./pages/Login.jsx";
 
 // Catches render-time errors anywhere below it, so one thrown error shows a
@@ -54,6 +55,7 @@ function Shell({ isMock, theme, onToggleTheme, isAuthed }) {
         <Route path="/screening" element={<Screening isMock={isMock} />} />
         <Route path="/fatigue" element={<Fatigue />} />
         <Route path="/history" element={<History />} />
+        <Route path="/analytics" element={<Analytics />} />
         <Route path="/login" element={isAuthed ? <Navigate to="/" replace /> : <Login />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -64,7 +66,7 @@ function Shell({ isMock, theme, onToggleTheme, isAuthed }) {
 
 export default function App() {
   const { ready, isAuthed } = useAuth();
-  const [isMock, setIsMock] = useState(null); // null = health not known yet (prevents a false MOCK flash on load)
+  const [isMock, setIsMock] = useState(null); // null = health not known yet (prevents a false "MOCK" flash on load)
   const [theme, setTheme] = useState(
     () => (typeof localStorage !== "undefined" && localStorage.getItem("se_theme")) || "dark"
   );

@@ -690,6 +690,7 @@ export function NavBar({ isMock, theme, onToggleTheme }) {
           <NavLink to="/screening">{t("nav.screening")}</NavLink>
           <NavLink to="/fatigue">{t("nav.fatigue")}</NavLink>
           <NavLink to="/history">{t("nav.history")}</NavLink>
+          <NavLink to="/analytics">{t("nav.analytics")}</NavLink>
         </div>
         <div className="nav-status">
           <span className={`pill pill-sm ${modelPill.cls}`}>
@@ -719,6 +720,7 @@ export function NavBar({ isMock, theme, onToggleTheme }) {
           <NavLink to="/screening" onClick={closeMenu}>{t("nav.screening")}</NavLink>
           <NavLink to="/fatigue" onClick={closeMenu}>{t("nav.fatigue")}</NavLink>
           <NavLink to="/history" onClick={closeMenu}>{t("nav.history")}</NavLink>
+          <NavLink to="/analytics" onClick={closeMenu}>{t("nav.analytics")}</NavLink>
           <div className="nav-mobile-foot">
             <span className={`pill pill-sm ${modelPill.cls}`}>
               <span className="dot" />{modelPill.txt}
