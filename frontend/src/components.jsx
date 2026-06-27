@@ -505,6 +505,7 @@ const AM_EYE_OFF = (
 
 export function AuthModal({ open, onClose }) {
   const { login, register, loginWithGoogle } = useAuth();
+  const { t } = useT();
   const [mode, setMode] = useState("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -575,9 +576,9 @@ export function AuthModal({ open, onClose }) {
       <div className="amodal" role="dialog" aria-modal="true" aria-label="Authentication" ref={modalRef} tabIndex={-1}>
         <button className="amodal-x" onClick={onClose} aria-label="Close">×</button>
         <div className="amodal-logo"><EyeLogo /></div>
-        <h2 className="amodal-h">{isReg ? "Create your account" : "Welcome back"}</h2>
+        <h2 className="amodal-h">{isReg ? t("auth.createAccount") : t("auth.welcomeBack")}</h2>
         <p className="amodal-sub">
-          {isReg ? "Register to save your screenings to a private history." : "Sign in to continue to Smart Eye."}
+          {isReg ? t("amodal.subRegister") : t("amodal.subLogin")}
         </p>
 
         {error && <div className="amodal-err">{error}</div>}
@@ -585,18 +586,18 @@ export function AuthModal({ open, onClose }) {
         <form onSubmit={submit} className="amodal-form">
           {isReg && (
             <div className="amodal-ipt">{AM_USER}
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Full name" autoComplete="name" />
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("amodal.fullName")} autoComplete="name" />
             </div>
           )}
           <div className="amodal-ipt">{AM_MAIL}
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" autoComplete="email" required />
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={t("amodal.emailPlaceholder")} autoComplete="email" required />
           </div>
           <div className="amodal-ipt has-eye">{AM_LOCK}
             <input
               type={showPw ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={isReg ? "Password (min 6 characters)" : "Password"}
+              placeholder={isReg ? t("amodal.pwRegister") : t("amodal.pwLogin")}
               autoComplete={isReg ? "new-password" : "current-password"}
               required
             />
@@ -606,22 +607,22 @@ export function AuthModal({ open, onClose }) {
           </div>
           {isReg && (
             <div className="amodal-ipt">{AM_LOCK}
-              <input type={showPw ? "text" : "password"} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder="Confirm password" autoComplete="new-password" required />
+              <input type={showPw ? "text" : "password"} value={confirm} onChange={(e) => setConfirm(e.target.value)} placeholder={t("amodal.confirmPw")} autoComplete="new-password" required />
             </div>
           )}
           <button type="submit" className="amodal-submit" disabled={busy}>
-            {busy ? "Please wait…" : isReg ? "Create account" : "Continue"}
+            {busy ? t("auth.pleaseWait") : isReg ? t("auth.createAccountBtn") : t("amodal.continue")}
           </button>
         </form>
 
-        <div className="amodal-or"><span>OR</span></div>
+        <div className="amodal-or"><span>{t("auth.or")}</span></div>
 
         <button
           type="button"
           className="amodal-google"
           onClick={loginWithGoogle}
           disabled={!googleOn}
-          title={googleOn ? "Continue with Google" : "Google sign-in is not configured on the server"}
+          title={googleOn ? t("auth.googleContinue") : t("auth.googleNotConfigured")}
         >
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z" />
@@ -629,13 +630,13 @@ export function AuthModal({ open, onClose }) {
             <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z" />
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.46 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38Z" />
           </svg>
-          Continue with Google
+          {t("auth.googleContinue")}
         </button>
-        {!googleOn && <p className="amodal-note">Continue with Google activates once the server has OAuth credentials set.</p>}
+        {!googleOn && <p className="amodal-note">{t("amodal.googleNote")}</p>}
 
         <p className="amodal-switch">
-          {isReg ? "Already have an account?" : "Don't have an account?"}{" "}
-          <button type="button" onClick={flip}>{isReg ? "Log in" : "Sign up"}</button>
+          {isReg ? t("auth.haveAccount") : t("amodal.signUpPrompt")}{" "}
+          <button type="button" onClick={flip}>{isReg ? t("amodal.login") : t("amodal.signUp")}</button>
         </p>
       </div>
     </div>,

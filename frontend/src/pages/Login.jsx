@@ -5,14 +5,16 @@ import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth";
 import { getHealth } from "../api";
 import { EyeLogo } from "../components";
+import { useT } from "../i18n";
 
-const GOOGLE_ERRORS = {
-  google_not_configured: "Google sign-in isn't configured on the server yet.",
-  google_failed: "Google sign-in didn't complete. Please try again.",
+const GOOGLE_ERROR_KEYS = {
+  google_not_configured: "auth.googleErrNotConfigured",
+  google_failed: "auth.googleErrFailed",
 };
 
 export default function Login() {
   const { login, register, loginWithGoogle, continueAsGuest } = useAuth();
+  const { t } = useT();
   const [params] = useSearchParams();
   const [mode, setMode] = useState("login"); // login | register
   const [email, setEmail] = useState("");
@@ -24,7 +26,7 @@ export default function Login() {
 
   useEffect(() => {
     const e = params.get("error");
-    if (e) setError(GOOGLE_ERRORS[e] || "Sign-in failed. Please try again.");
+    if (e) setError(t(GOOGLE_ERROR_KEYS[e] || "auth.signInFailed"));
     getHealth().then((h) => setGoogleOn(!!h.google_auth_configured)).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -49,14 +51,14 @@ export default function Login() {
       <div className="auth-card">
         <div className="auth-brand">
           <div className="logo"><EyeLogo /></div>
-          <div><b>SMART EYE</b><span className="tag">Clinical Intelligence</span></div>
+          <div><b>SMART EYE</b><span className="tag">{t("auth.brandSub")}</span></div>
         </div>
 
-        <h1 className="auth-h">{mode === "login" ? "Welcome back" : "Create your account"}</h1>
+        <h1 className="auth-h">{mode === "login" ? t("auth.welcomeBack") : t("auth.createAccount")}</h1>
         <p className="auth-sub">
           {mode === "login"
-            ? "Sign in to access your screenings and history."
-            : "Register to save your screenings to your own private history."}
+            ? t("auth.subLogin")
+            : t("auth.subRegister")}
         </p>
 
         {error && <div className="err-strip">{error}</div>}
@@ -66,7 +68,7 @@ export default function Login() {
           className="btn btn-google"
           onClick={loginWithGoogle}
           disabled={!googleOn}
-          title={googleOn ? "Continue with Google" : "Google sign-in is not configured on the server"}
+          title={googleOn ? t("auth.googleContinue") : t("auth.googleNotConfigured")}
         >
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"/>
@@ -74,46 +76,46 @@ export default function Login() {
             <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84Z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.46 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38Z"/>
           </svg>
-          Continue with Google
+          {t("auth.googleContinue")}
         </button>
         {!googleOn && (
-          <p className="muted small auth-note">Google sign-in appears once the server has Google OAuth credentials configured.</p>
+          <p className="muted small auth-note">{t("auth.googleNote")}</p>
         )}
 
-        <div className="auth-or"><span>or</span></div>
+        <div className="auth-or"><span>{t("auth.or")}</span></div>
 
         <form onSubmit={submit} className="auth-form">
           {mode === "register" && (
             <label className="field">
-              <span>Name</span>
-              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" autoComplete="name" />
+              <span>{t("auth.name")}</span>
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t("auth.namePlaceholder")} autoComplete="name" />
             </label>
           )}
           <label className="field">
-            <span>Email</span>
+            <span>{t("auth.email")}</span>
             <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email" required />
           </label>
           <label className="field">
-            <span>Password</span>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === "register" ? "At least 6 characters" : "Your password"} autoComplete={mode === "login" ? "current-password" : "new-password"} required />
+            <span>{t("auth.password")}</span>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={mode === "register" ? t("auth.passwordRegister") : t("auth.passwordLogin")} autoComplete={mode === "login" ? "current-password" : "new-password"} required />
           </label>
           <button type="submit" className="btn btn-primary btn-block" disabled={busy}>
-            {busy ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
+            {busy ? t("auth.pleaseWait") : mode === "login" ? t("auth.signIn") : t("auth.createAccountBtn")}
           </button>
         </form>
 
         <p className="auth-switch">
-          {mode === "login" ? "New to Smart Eye?" : "Already have an account?"}{" "}
+          {mode === "login" ? t("auth.newHere") : t("auth.haveAccount")}{" "}
           <button type="button" className="link-btn" onClick={() => { setMode(mode === "login" ? "register" : "login"); setError(null); }}>
-            {mode === "login" ? "Create an account" : "Sign in"}
+            {mode === "login" ? t("auth.createLink") : t("auth.signIn")}
           </button>
         </p>
 
         <div className="auth-guest">
           <button type="button" className="btn btn-ghost btn-block" onClick={continueAsGuest}>
-            Continue as guest
+            {t("auth.continueGuest")}
           </button>
-          <p className="muted small auth-note">No account needed. Screenings are saved to a shared anonymous history on this server.</p>
+          <p className="muted small auth-note">{t("auth.guestNote")}</p>
         </div>
       </div>
 
