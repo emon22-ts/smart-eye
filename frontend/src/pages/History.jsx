@@ -5,13 +5,15 @@ import { useNavigate } from "react-router-dom";
 import { listSessions, deleteSession } from "../api";
 import { COLOURS } from "../constants";
 import { Met } from "../components";
+import { useT } from "../i18n";
 
 // Small self-contained OHI trend sparkline (0-100 scale, oldest -> newest).
 function OhiTrend({ values }) {
+  const { t } = useT();
   const w = 520;
   const h = 60;
   if (!values || values.length < 2) {
-    return <p className="muted small">Run at least two screenings to see your OHI trend.</p>;
+    return <p className="muted small">{t("hist.trendEmpty")}</p>;
   }
   const n = values.length;
   const pts = values
@@ -33,25 +35,26 @@ function OhiTrend({ values }) {
 
 // Side-by-side comparison of any two saved sessions (uses already-loaded rows).
 function CompareSessions({ rows }) {
+  const { t } = useT();
   const valid = (rows || []).filter((r) => r.ohi != null);
   const [aId, setAId] = useState(valid[0]?.id);
   const [bId, setBId] = useState(valid[1]?.id);
   if (valid.length < 2) {
-    return <p className="muted small">Run at least two screenings to compare them.</p>;
+    return <p className="muted small">{t("hist.compareEmpty")}</p>;
   }
   const A = valid.find((r) => r.id === aId) || valid[0];
   const B = valid.find((r) => r.id === bId) || valid[1];
   const fmt = (r) => new Date(r.created_at).toLocaleString();
   const conf = (r) => (r.top_confidence == null ? "\u2014" : `${(r.top_confidence * 100).toFixed(0)}%`);
-  const finding = (r) => (r.top_class || "\u2014").replace(/_/g, " ");
+  const finding = (r) => (r.top_class ? t(`class.${r.top_class}`) : "\u2014");
   const fat = (r) => (r.fatigue_score == null ? "\u2014" : `${Math.round(r.fatigue_score)}/100`);
   const ohiDelta = Math.round(B.ohi - A.ohi);
   const lines = [
     ["OHI", Math.round(A.ohi), Math.round(B.ohi)],
-    ["Risk", A.band || "\u2014", B.band || "\u2014"],
-    ["Top finding", finding(A), finding(B)],
-    ["Confidence", conf(A), conf(B)],
-    ["Fatigue", fat(A), fat(B)],
+    [t("hist.cmpRisk"), A.band || "\u2014", B.band || "\u2014"],
+    [t("hist.cmpTop"), finding(A), finding(B)],
+    [t("hist.cmpConf"), conf(A), conf(B)],
+    [t("hist.cmpFat"), fat(A), fat(B)],
   ];
   return (
     <div className="cmp">
@@ -85,9 +88,10 @@ function CompareSessions({ rows }) {
 }
 
 export default function History() {
+  const { t } = useT();
   const [rows, setRows] = useState(null);
   const [error, setError] = useState(null);
-  const isGuest = typeof localStorage === "undefined" || localStorage.getItem("se_token") == null;
+  const isGuest = typeof localStorage === "undefined" || !localStorage.getItem("se_token");
   const nav = useNavigate();
 
   const load = useCallback(async () => {
@@ -96,7 +100,7 @@ export default function History() {
     try {
       setRows(await listSessions());
     } catch (e) {
-      setError(`Could not load history: ${e.message}`);
+      setError(`${t("hist.loadError")}: ${e.message}`);
       setRows([]);
     }
   }, [isGuest]);
@@ -169,24 +173,24 @@ export default function History() {
   let trendColour;
   if (stats && withOhi.length >= 2) {
     const delta = withOhi[0].ohi - withOhi[1].ohi; // newest minus previous
-    if (delta > 1) { trendArrow = " ↑"; trendColour = "var(--success)"; }
-    else if (delta < -1) { trendArrow = " ↓"; trendColour = "var(--danger)"; }
-    else { trendArrow = " →"; }
+    if (delta > 1) { trendArrow = " \u2191"; trendColour = "var(--success)"; }
+    else if (delta < -1) { trendArrow = " \u2193"; trendColour = "var(--danger)"; }
+    else { trendArrow = " \u2192"; }
   }
 
   if (isGuest) {
     return (
       <main className="se-wrap page">
         <div className="page-head">
-          <span className="eyebrow">History</span>
-          <h1 className="page-h">Session history</h1>
+          <span className="eyebrow">{t("hist.eyebrow")}</span>
+          <h1 className="page-h">{t("hist.title")}</h1>
         </div>
         <section className="card" style={{ textAlign: "center", padding: "48px 24px" }}>
-          <h3 style={{ marginBottom: 8 }}>Sign in to save your history</h3>
+          <h3 style={{ marginBottom: 8 }}>{t("hist.signInTitle")}</h3>
           <p className="muted" style={{ marginBottom: 20, maxWidth: 420, marginLeft: "auto", marginRight: "auto" }}>
-            Your screenings are saved privately to your account. Sign in to keep a history you can revisit and export.
+            {t("hist.signInBody")}
           </p>
-          <button className="btn btn-primary" onClick={() => nav("/login")}>Sign in</button>
+          <button className="btn btn-primary" onClick={() => nav("/login")}>{t("nav.signIn")}</button>
         </section>
       </main>
     );
@@ -195,9 +199,9 @@ export default function History() {
   return (
     <main className="se-wrap page">
       <div className="page-head">
-        <span className="eyebrow">History</span>
-        <h1 className="page-h">Session history</h1>
-        <p className="lead">Every screening you run is saved locally on the server. Anonymous — only scores and timestamps.</p>
+        <span className="eyebrow">{t("hist.eyebrow")}</span>
+        <h1 className="page-h">{t("hist.title")}</h1>
+        <p className="lead">{t("hist.lead")}</p>
       </div>
 
       {error && <div className="err-strip">{error}</div>}
@@ -205,19 +209,19 @@ export default function History() {
       {rows && rows.length > 0 && (
         <section className="card" style={{ marginBottom: 16 }}>
           <div className="card-head">
-            <span className="eyebrow">Trend</span><h3>Ocular Health Index over time</h3>
+            <span className="eyebrow">{t("hist.trend")}</span><h3>{t("hist.trendTitle")}</h3>
           </div>
           {stats && (
             <div className="metric-row" style={{ marginBottom: 16 }}>
-              <Met label="Screenings" value={stats.count} />
-              <Met label="Average OHI" value={stats.avg} />
-              <Met label="Latest OHI" value={`${stats.latest}${trendArrow}`} accent={trendColour} />
-              <Met label="High-risk" value={stats.highRisk} accent={stats.highRisk > 0 ? "var(--danger)" : undefined} />
+              <Met label={t("hist.statScreenings")} value={stats.count} />
+              <Met label={t("hist.statAvg")} value={stats.avg} />
+              <Met label={t("hist.statLatest")} value={`${stats.latest}${trendArrow}`} accent={trendColour} />
+              <Met label={t("hist.statHighRisk")} value={stats.highRisk} accent={stats.highRisk > 0 ? "var(--danger)" : undefined} />
             </div>
           )}
           <OhiTrend values={ohiSeries} />
           <p className="muted small" style={{ marginTop: 8 }}>
-            Oldest → newest. Dashed line marks OHI 67 (the Low/Moderate boundary). Higher is healthier.
+            {t("hist.trendCaption")}
           </p>
         </section>
       )}
@@ -225,7 +229,7 @@ export default function History() {
       {rows && rows.length >= 2 && (
         <section className="card" style={{ marginBottom: 16 }}>
           <div className="card-head">
-            <span className="eyebrow">Compare</span><h3>Compare two screenings</h3>
+            <span className="eyebrow">{t("hist.compare")}</span><h3>{t("hist.compareTitle")}</h3>
           </div>
           <CompareSessions rows={rows} />
         </section>
@@ -233,20 +237,20 @@ export default function History() {
 
       <section className="card">
         <div className="card-head" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div><span className="eyebrow">Records</span><h3>All sessions</h3></div>
+          <div><span className="eyebrow">{t("hist.records")}</span><h3>{t("hist.allSessions")}</h3></div>
           {rows && rows.length > 0 && (
-            <button className="btn btn-ghost" onClick={exportCsv}>Download CSV</button>
+            <button className="btn btn-ghost" onClick={exportCsv}>{t("hist.downloadCsv")}</button>
           )}
         </div>
 
         {rows === null ? (
-          <p className="muted">Loading…</p>
+          <p className="muted">{t("hist.loading")}</p>
         ) : rows.length === 0 ? (
-          <p className="muted">No sessions yet — run a screening and it will appear here.</p>
+          <p className="muted">{t("hist.empty")}</p>
         ) : (
           <div className="hist">
             <div className="hist-head hist-head-6">
-              <span>When</span><span>OHI</span><span>Risk</span><span>Top finding</span><span>Conf.</span><span>Fatigue</span><span />
+              <span>{t("hist.colWhen")}</span><span>OHI</span><span>{t("hist.colRisk")}</span><span>{t("hist.colTop")}</span><span>{t("hist.colConf")}</span><span>{t("hist.colFat")}</span><span />
             </div>
             {rows.map((r) => (
               <div className="hist-row hist-row-6" key={r.id}>
@@ -256,7 +260,7 @@ export default function History() {
                 </span>
                 <span>{badge(r.colour, r.band)}</span>
                 <span className="hist-top">
-                  {(r.top_class || "—").replace(/_/g, " ")}
+                  {r.top_class ? t(`class.${r.top_class}`) : "—"}
                   {r.is_mock ? <span className="mock-tag">mock</span> : null}
                 </span>
                 <span className="mono small">
@@ -265,7 +269,7 @@ export default function History() {
                 <span className="mono small">
                   {r.fatigue_score == null ? "—" : `${Math.round(r.fatigue_score)}/100`}
                 </span>
-                <span><button className="btn-icon" onClick={() => remove(r.id)} title="Delete session">✕</button></span>
+                <span><button className="btn-icon" onClick={() => remove(r.id)} title={t("hist.deleteTitle")}>✕</button></span>
               </div>
             ))}
           </div>
