@@ -410,6 +410,20 @@ export const STYLES = `
 .insight-dot{flex:0 0 auto;width:7px;height:7px;margin-top:7px;border-radius:50%;
   background:var(--primary);box-shadow:0 0 0 4px rgba(59,130,246,.14)}
 
+/* Doctor-visit reminder banner */
+.remind-banner{display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:14px;margin-bottom:16px;border:1px solid var(--border-2)}
+.remind-high{background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.35)}
+.remind-due{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.35)}
+.remind-ic{flex:0 0 auto;display:flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:11px}
+.remind-high .remind-ic{background:rgba(239,68,68,.15);color:var(--danger)}
+.remind-due .remind-ic{background:rgba(59,130,246,.15);color:var(--primary)}
+.remind-text{flex:1}
+.remind-text b{display:block;font-size:15px;margin-bottom:4px}
+.remind-text p{margin:0 0 12px;font-size:13px;line-height:1.5;color:var(--muted)}
+.remind-actions{display:flex;gap:9px;flex-wrap:wrap}
+.btn-sm{padding:7px 14px;font-size:12.5px}
+@media(max-width:480px){.remind-banner{flex-direction:column;gap:10px}}
+
 /* History search & filter bar */
 .hist-filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px}
 .hist-search{position:relative;flex:1 1 240px;min-width:200px}

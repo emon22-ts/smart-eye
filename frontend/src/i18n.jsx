@@ -258,6 +258,17 @@ const DICT = {
   "toast.pdfDownloaded": { en: "Report downloaded", bn: "রিপোর্ট ডাউনলোড হয়েছে" },
   "toast.shared":       { en: "Report shared", bn: "রিপোর্ট শেয়ার হয়েছে" },
 
+  // ---- doctor visit reminder ----
+  "remind.highTitle":   { en: "Consider booking an eye exam", bn: "একটি চোখ পরীক্ষার অ্যাপয়েন্টমেন্ট বিবেচনা করুন" },
+  "remind.highBody":    { en: "Your most recent screening flagged a high-risk result. A professional eye examination is recommended — this tool is a preliminary screen, not a diagnosis.", bn: "আপনার সাম্প্রতিক স্ক্রিনিং একটি উচ্চ-ঝুঁকির ফলাফল চিহ্নিত করেছে। একটি পেশাদার চোখ পরীক্ষার সুপারিশ করা হয় — এই সরঞ্জামটি একটি প্রাথমিক স্ক্রিন, রোগনির্ণয় নয়।" },
+  "remind.dueTitle":    { en: "Time for a follow-up screening", bn: "একটি ফলো-আপ স্ক্রিনিংয়ের সময়" },
+  "remind.dueBody":     { en: "It's been a while since your last screening. Regular checks help catch changes early.", bn: "আপনার শেষ স্ক্রিনিংয়ের পর থেকে কিছু সময় হয়ে গেছে। নিয়মিত পরীক্ষা পরিবর্তনগুলি প্রাথমিকভাবে ধরতে সাহায্য করে।" },
+  "remind.addCalendar": { en: "Add reminder to calendar", bn: "ক্যালেন্ডারে অনুস্মারক যোগ করুন" },
+  "remind.dismiss":     { en: "Dismiss", bn: "বাতিল করুন" },
+  "remind.eventTitle":  { en: "Smart Eye — eye screening follow-up", bn: "Smart Eye — চোখ স্ক্রিনিং ফলো-আপ" },
+  "remind.eventDesc":   { en: "Follow-up reminder from your Smart Eye screening. Consider booking an appointment with an eye-care professional.", bn: "আপনার Smart Eye স্ক্রিনিং থেকে ফলো-আপ অনুস্মারক। একজন চক্ষু-বিশেষজ্ঞের সাথে অ্যাপয়েন্টমেন্ট বিবেচনা করুন।" },
+  "toast.calendarAdded": { en: "Calendar reminder downloaded", bn: "ক্যালেন্ডার অনুস্মারক ডাউনলোড হয়েছে" },
+
   // ---- history insights (placeholders {n} {c} {cls} filled at runtime) ----
   "ins.title":    { en: "Insights", bn: "অন্তর্দৃষ্টি" },
   "ins.single":   { en: "One screening recorded — run a few more to unlock trend insights.", bn: "একটি স্ক্রিনিং রেকর্ড হয়েছে — প্রবণতা অন্তর্দৃষ্টি আনলক করতে আরও কয়েকটি চালান।" },

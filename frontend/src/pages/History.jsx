@@ -230,6 +230,59 @@ export default function History() {
     });
   }, [rows, query, riskFilter, t]);
 
+  // Doctor-visit reminder: surfaces when the latest screening is high-risk or
+  // it's been a while since the last one. Dismissal is remembered per session.
+  const [remindDismissed, setRemindDismissed] = useState(
+    () => (typeof localStorage !== "undefined" && localStorage.getItem("se_remind_dismiss")) || ""
+  );
+  const reminder = useMemo(() => {
+    if (!rows || rows.length === 0) return null;
+    const latest = rows[0];
+    const days = (Date.now() - new Date(latest.created_at).getTime()) / 86400000;
+    const high = latest.colour === "red";
+    const due = days >= 90;
+    if (!high && !due) return null;
+    if (remindDismissed === String(latest.id)) return null;
+    return { type: high ? "high" : "due", latestId: latest.id, daysOut: high ? 14 : 180 };
+  }, [rows, remindDismissed]);
+
+  const dismissRemind = () => {
+    if (!reminder) return;
+    try { localStorage.setItem("se_remind_dismiss", String(reminder.latestId)); } catch { /* ignore */ }
+    setRemindDismissed(String(reminder.latestId));
+  };
+
+  const addToCalendar = () => {
+    if (!reminder) return;
+    const esc = (s) => String(s).replace(/([,;\\])/g, "\\$1");
+    const ymd = (d) => `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}`;
+    const start = new Date(Date.now() + reminder.daysOut * 86400000);
+    const end = new Date(start.getTime() + 86400000);
+    const stamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+    const ics = [
+      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Smart Eye//Screening//EN", "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT",
+      `UID:smarteye-${reminder.latestId}-${Date.now()}@smart-eye`,
+      `DTSTAMP:${stamp}`,
+      `DTSTART;VALUE=DATE:${ymd(start)}`,
+      `DTEND;VALUE=DATE:${ymd(end)}`,
+      `SUMMARY:${esc(t("remind.eventTitle"))}`,
+      `DESCRIPTION:${esc(t("remind.eventDesc"))}`,
+      "BEGIN:VALARM", "TRIGGER:-P1D", "ACTION:DISPLAY", `DESCRIPTION:${esc(t("remind.eventTitle"))}`, "END:VALARM",
+      "END:VEVENT", "END:VCALENDAR",
+    ].join("\r\n");
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "smart_eye_reminder.ics";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast(t("toast.calendarAdded"), "success");
+  };
+
   if (isGuest) {
     return (
       <main className="se-wrap page">
@@ -257,6 +310,24 @@ export default function History() {
       </div>
 
       {error && <div className="err-strip">{error}</div>}
+
+      {reminder && (
+        <div className={`remind-banner remind-${reminder.type} anim-up`}>
+          <div className="remind-ic">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" />
+            </svg>
+          </div>
+          <div className="remind-text">
+            <b>{reminder.type === "high" ? t("remind.highTitle") : t("remind.dueTitle")}</b>
+            <p>{reminder.type === "high" ? t("remind.highBody") : t("remind.dueBody")}</p>
+            <div className="remind-actions">
+              <button className="btn btn-primary btn-sm" onClick={addToCalendar}>{t("remind.addCalendar")}</button>
+              <button className="btn btn-ghost btn-sm" onClick={dismissRemind}>{t("remind.dismiss")}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {insights.length > 0 && (
         <section className="card insights-card" style={{ marginBottom: 16 }}>
