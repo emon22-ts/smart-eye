@@ -1,7 +1,7 @@
 // Shared presentational components for Smart Eye, styled in the Concept C language.
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { COLOURS, SPARK_LEN } from "./constants";
 import { useAuth } from "./auth";
 import { useT, LANGS } from "./i18n";
@@ -423,6 +423,8 @@ export function NotificationsBell({ isMock }) {
 
 export function UserMenu({ onSignIn }) {
   const { user, logout } = useAuth();
+  const { t } = useT();
+  const nav = useNavigate();
   const [open, setOpen] = useState(false);
   const ref = useDismiss(open, setOpen);
   const signedIn = !!user;
@@ -443,11 +445,16 @@ export function UserMenu({ onSignIn }) {
               <span>{signedIn ? user?.email : "Not signed in"}</span>
             </div>
           </div>
+          {signedIn && (
+            <button className="pop-action" onClick={() => { setOpen(false); nav("/profile"); }}>
+              {t("profile.menuLink")}
+            </button>
+          )}
           <button
             className="pop-action"
             onClick={() => { setOpen(false); if (signedIn) { logout(); } else { onSignIn && onSignIn(); } }}
           >
-            {signedIn ? "Sign out" : "Sign in / Register"}
+            {signedIn ? t("nav.signOut") : "Sign in / Register"}
           </button>
         </div>
       )}

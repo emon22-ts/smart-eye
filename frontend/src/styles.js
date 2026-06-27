@@ -424,6 +424,27 @@ export const STYLES = `
 .btn-sm{padding:7px 14px;font-size:12.5px}
 @media(max-width:480px){.remind-banner{flex-direction:column;gap:10px}}
 
+/* User profile page */
+.prof-card{max-width:760px}
+.prof-photo-row{display:flex;align-items:center;gap:18px;padding-bottom:20px;margin-bottom:6px;border-bottom:1px solid var(--border)}
+.prof-avatar{flex:0 0 auto;width:80px;height:80px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#3b82f6,#06b6d4);color:#fff;font-size:32px;font-weight:600}
+.prof-avatar img{width:100%;height:100%;object-fit:cover}
+.prof-photo-actions{display:flex;flex-direction:column;gap:8px}
+.prof-photo-btns{display:flex;gap:8px;flex-wrap:wrap}
+.prof-sec{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:22px 0 12px;font-weight:600}
+.prof-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.prof-grid{grid-template-columns:1fr}}
+.prof-grid .field{display:flex;flex-direction:column;gap:6px}
+.prof-grid .field>span{font-size:12.5px;color:var(--muted);font-weight:500}
+.prof-grid .field input,.prof-grid .field select{padding:10px 12px;border-radius:10px;border:1px solid var(--border-2);
+  background:var(--card-2);color:var(--fg);font-family:inherit;font-size:14px}
+.prof-grid .field input:focus,.prof-grid .field select:focus{outline:none;border-color:var(--primary)}
+.prof-grid .field input:disabled{opacity:.6;cursor:not-allowed}
+.prof-grid .field small{font-size:11px}
+.prof-save{margin-top:22px;display:flex;justify-content:flex-end}
+@media(max-width:560px){.prof-save .btn{width:100%}}
+
 /* History search & filter bar */
 .hist-filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px}
 .hist-search{position:relative;flex:1 1 240px;min-width:200px}

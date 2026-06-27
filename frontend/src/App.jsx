@@ -13,6 +13,7 @@ import Fatigue from "./pages/Fatigue.jsx";
 import History from "./pages/History.jsx";
 import Analytics from "./pages/Analytics.jsx";
 import Help from "./pages/Help.jsx";
+import Profile from "./pages/Profile.jsx";
 import Login from "./pages/Login.jsx";
 
 // Catches render-time errors anywhere below it, so one thrown error shows a
@@ -58,6 +59,7 @@ function Shell({ isMock, theme, onToggleTheme, a11y, onToggleA11y, isAuthed }) {
         <Route path="/history" element={<History />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/help" element={<Help />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={isAuthed ? <Navigate to="/" replace /> : <Login />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
