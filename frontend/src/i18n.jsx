@@ -137,6 +137,30 @@ const DICT = {
   "class.Cataract":             { en: "Cataract", bn: "ছানি" },
   "class.Glaucoma":             { en: "Glaucoma", bn: "গ্লুকোমা" },
   "class.Diabetic_Retinopathy": { en: "Diabetic Retinopathy", bn: "ডায়াবেটিক রেটিনোপ্যাথি" },
+
+  // ---- fatigue page ----
+  "fat.eyebrow":        { en: "Fatigue", bn: "ক্লান্তি" },
+  "fat.title":          { en: "Real-time fatigue & drowsiness monitor", bn: "রিয়েল-টাইম ক্লান্তি ও তন্দ্রা মনিটর" },
+  "fat.lead":           { en: "Webcam eye-aspect-ratio tracking with blink-rate analysis. Processing is on-device; only coordinates are sent to score EAR.", bn: "ব্লিঙ্ক-রেট বিশ্লেষণ সহ ওয়েবক্যাম আই-অ্যাসপেক্ট-রেশিও ট্র্যাকিং। প্রসেসিং ডিভাইসেই হয়; শুধু স্থানাঙ্ক EAR স্কোর করতে পাঠানো হয়।" },
+  "fat.live":           { en: "Live", bn: "লাইভ" },
+  "fat.monitor":        { en: "Fatigue monitor", bn: "ক্লান্তি মনিটর" },
+  "fat.st.idle":        { en: "idle", bn: "নিষ্ক্রিয়" },
+  "fat.st.loading":     { en: "loading models", bn: "মডেল লোড হচ্ছে" },
+  "fat.st.noface":      { en: "no face", bn: "মুখ নেই" },
+  "fat.st.liveLabel":   { en: "live", bn: "লাইভ" },
+  "fat.noFaceBadge":    { en: "NO FACE", bn: "মুখ নেই" },
+  "fat.tracking":       { en: "TRACKING", bn: "ট্র্যাকিং" },
+  "fat.drowsyAlert":    { en: "DROWSINESS ALERT", bn: "তন্দ্রা সতর্কতা" },
+  "fat.idleText":       { en: "press Start camera to begin tracking", bn: "ট্র্যাকিং শুরু করতে Start camera চাপুন" },
+  "fat.loadingMesh":    { en: "loading face mesh…", bn: "ফেস মেশ লোড হচ্ছে…" },
+  "fat.ear":            { en: "EAR", bn: "EAR" },
+  "fat.blink":          { en: "Blink / min", bn: "ব্লিঙ্ক / মিনিট" },
+  "fat.fatigue":        { en: "Fatigue", bn: "ক্লান্তি" },
+  "fat.session":        { en: "Session", bn: "সেশন" },
+  "fat.startCam":       { en: "Start camera", bn: "ক্যামেরা শুরু করুন" },
+  "fat.loadingModels":  { en: "Loading models…", bn: "মডেল লোড হচ্ছে…" },
+  "fat.stopCam":        { en: "Stop camera", bn: "ক্যামেরা বন্ধ করুন" },
+  "fat.disc":           { en: "Face detection runs entirely in your browser (MediaPipe Face Mesh). Only landmark coordinates are sent to the server to compute EAR — your video never leaves this device.", bn: "ফেস সনাক্তকরণ সম্পূর্ণরূপে আপনার ব্রাউজারে চলে (MediaPipe Face Mesh)। শুধু ল্যান্ডমার্ক স্থানাঙ্ক EAR গণনা করতে সার্ভারে পাঠানো হয় — আপনার ভিডিও কখনো এই ডিভাইস ছাড়ে না।" },
 };
 
 const LangCtx = createContext({ lang: "en", t: (k) => k, setLang: () => {} });

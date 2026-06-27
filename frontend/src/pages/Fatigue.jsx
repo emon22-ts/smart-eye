@@ -6,6 +6,7 @@ import { FaceMesh } from "@mediapipe/face_mesh";
 import { postFatigueFrame } from "../api";
 import { FRAME_INTERVAL_MS, SPARK_LEN, EAR_THRESHOLD, fmtTime } from "../constants";
 import { IrisVisual, Met, Sparkline } from "../components";
+import { useT } from "../i18n";
 
 // MediaPipe FaceMesh eye landmark indices, ordered to match the backend EAR
 // formula's expected p1..p6: [outer_corner, top1, top2, inner_corner, bottom2, bottom1].
@@ -17,6 +18,7 @@ const LEFT_SLOT  = [36, 37, 38, 39, 40, 41];
 const RIGHT_SLOT = [42, 43, 44, 45, 46, 47];
 
 export default function Fatigue() {
+  const { t } = useT();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
@@ -229,25 +231,25 @@ export default function Fatigue() {
     fatigueScore < 34 ? "var(--success)" : fatigueScore < 67 ? "var(--warning)" : "var(--danger)";
 
   let statusCls = "";
-  let statusTxt = modelsReady ? "idle" : "loading models";
+  let statusTxt = modelsReady ? t("fat.st.idle") : t("fat.st.loading");
   if (running) {
-    if (camStatus === "face-lost") { statusCls = "pill-lost"; statusTxt = "no face"; }
-    else { statusCls = "pill-live"; statusTxt = "live"; }
+    if (camStatus === "face-lost") { statusCls = "pill-lost"; statusTxt = t("fat.st.noface"); }
+    else { statusCls = "pill-live"; statusTxt = t("fat.st.liveLabel"); }
   }
 
   return (
     <main className="se-wrap page">
       <div className="page-head">
-        <span className="eyebrow">Fatigue</span>
-        <h1 className="page-h">Real-time fatigue &amp; drowsiness monitor</h1>
-        <p className="lead">Webcam eye-aspect-ratio tracking with blink-rate analysis. Processing is on-device; only coordinates are sent to score EAR.</p>
+        <span className="eyebrow">{t("fat.eyebrow")}</span>
+        <h1 className="page-h">{t("fat.title")}</h1>
+        <p className="lead">{t("fat.lead")}</p>
       </div>
 
       {error && <div className="err-strip">{error}</div>}
 
       <section className="card cam-card-full">
         <div className="card-head">
-          <span className="eyebrow">Live</span><h3>Fatigue monitor</h3>
+          <span className="eyebrow">{t("fat.live")}</span><h3>{t("fat.monitor")}</h3>
           <span className={`pill ${statusCls}`}><span className="dot" />{statusTxt}</span>
         </div>
 
@@ -255,23 +257,23 @@ export default function Fatigue() {
           <video ref={videoRef} className="cam-video" muted playsInline />
           <canvas ref={canvasRef} className="cam-overlay" />
           {running && <div className="rec">REC · LIVE</div>}
-          {running && <div className="fps">{camStatus === "face-lost" ? "NO FACE" : "TRACKING"}</div>}
-          {drowsy && <div className="drowsy">DROWSINESS ALERT</div>}
+          {running && <div className="fps">{camStatus === "face-lost" ? t("fat.noFaceBadge") : t("fat.tracking")}</div>}
+          {drowsy && <div className="drowsy">{t("fat.drowsyAlert")}</div>}
           {!running && (
             <div className="cam-idle">
               <IrisVisual />
               <div className="cam-idle-text">
-                {modelsReady ? "press Start camera to begin tracking" : "loading face mesh…"}
+                {modelsReady ? t("fat.idleText") : t("fat.loadingMesh")}
               </div>
             </div>
           )}
         </div>
 
         <div className="metric-row">
-          <Met label="EAR" value={hasData ? ear.toFixed(3) : "—"} accent="#7dd3fc" />
-          <Met label="Blink / min" value={hasData ? bpm.toFixed(0) : "—"} />
-          <Met label="Fatigue" value={hasData ? fatigueScore.toFixed(0) : "—"} accent={hasData ? fatigueColor : undefined} />
-          <Met label="Session" value={fmtTime(sessionSeconds)} />
+          <Met label={t("fat.ear")} value={hasData ? ear.toFixed(3) : "—"} accent="#7dd3fc" />
+          <Met label={t("fat.blink")} value={hasData ? bpm.toFixed(0) : "—"} />
+          <Met label={t("fat.fatigue")} value={hasData ? fatigueScore.toFixed(0) : "—"} accent={hasData ? fatigueColor : undefined} />
+          <Met label={t("fat.session")} value={fmtTime(sessionSeconds)} />
         </div>
 
         <Sparkline history={earHistory} threshold={EAR_THRESHOLD} />
@@ -279,16 +281,15 @@ export default function Fatigue() {
         <div className="cam-controls">
           {!running ? (
             <button className="btn btn-primary" onClick={startCamera} disabled={!modelsReady}>
-              {modelsReady ? "Start camera" : "Loading models…"}
+              {modelsReady ? t("fat.startCam") : t("fat.loadingModels")}
             </button>
           ) : (
-            <button className="btn btn-ghost" onClick={stopCamera}>Stop camera</button>
+            <button className="btn btn-ghost" onClick={stopCamera}>{t("fat.stopCam")}</button>
           )}
         </div>
 
         <p className="disc-foot">
-          Face detection runs entirely in your browser (MediaPipe Face Mesh). Only landmark coordinates are sent to
-          the server to compute EAR — your video never leaves this device.
+          {t("fat.disc")}
         </p>
       </section>
     </main>
