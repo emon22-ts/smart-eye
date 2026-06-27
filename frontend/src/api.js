@@ -105,15 +105,49 @@ export function deleteSession(id) {
   }).then(asJson);
 }
 
-export async function downloadSessionPdf(id) {
+// Fetch the server-generated professional PDF report for a session as a Blob.
+async function fetchSessionPdfBlob(id) {
   const res = await fetch(`${API_BASE}/api/sessions/${id}/pdf`, { headers: { ...authHeader() } });
   if (!res.ok) {
     let detail = "";
     try { const b = await res.json(); detail = b.error || b.detail || ""; } catch { /* non-JSON */ }
     throw new Error(detail || `server responded ${res.status}`);
   }
-  const blob = await res.blob();
+  return res.blob();
+}
+
+// Download the server-generated professional PDF report for a session (returns a file).
+export async function downloadSessionPdf(id) {
+  const blob = await fetchSessionPdfBlob(id);
   const url = URL.createObjectURL(blob);
-  window.open(url, "_blank");
-  setTimeout(() => URL.revokeObjectURL(url), 15000);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `smart_eye_report_${id}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+// Share the PDF via the native share sheet (Web Share API, level 2 — files).
+// Returns "shared" on success, "unsupported" if the browser can't share files
+// (caller should fall back to download), or throws "cancelled" if the user
+// dismissed the share sheet.
+export async function sharePdf(id) {
+  const blob = await fetchSessionPdfBlob(id);
+  const file = new File([blob], `smart_eye_report_${id}.pdf`, { type: "application/pdf" });
+  if (typeof navigator !== "undefined" && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({
+        files: [file],
+        title: "Smart Eye — Ocular Health Report",
+        text: "My Smart Eye screening report.",
+      });
+      return "shared";
+    } catch (e) {
+      if (e && e.name === "AbortError") throw new Error("cancelled");
+      throw e;
+    }
+  }
+  return "unsupported";
 }

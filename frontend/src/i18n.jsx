@@ -250,10 +250,13 @@ const DICT = {
   "detail.loadError":   { en: "Could not load this session.", bn: "এই সেশনটি লোড করা যায়নি।" },
   "detail.recorded":    { en: "Recorded", bn: "রেকর্ড করা হয়েছে" },
   "detail.downloadPdf": { en: "Download full report (PDF)", bn: "সম্পূর্ণ রিপোর্ট ডাউনলোড করুন (PDF)" },
+  "detail.share":       { en: "Share report", bn: "রিপোর্ট শেয়ার করুন" },
+  "detail.sharing":     { en: "Sharing…", bn: "শেয়ার হচ্ছে…" },
   "detail.preparing":   { en: "Preparing…", bn: "প্রস্তুত হচ্ছে…" },
   "detail.pdfError":    { en: "Could not generate the PDF.", bn: "PDF তৈরি করা যায়নি।" },
   "detail.close":       { en: "Close", bn: "বন্ধ করুন" },
   "toast.pdfDownloaded": { en: "Report downloaded", bn: "রিপোর্ট ডাউনলোড হয়েছে" },
+  "toast.shared":       { en: "Report shared", bn: "রিপোর্ট শেয়ার হয়েছে" },
 
   // ---- history insights (placeholders {n} {c} {cls} filled at runtime) ----
   "ins.title":    { en: "Insights", bn: "অন্তর্দৃষ্টি" },

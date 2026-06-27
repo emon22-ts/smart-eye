@@ -6,7 +6,7 @@ import { COLOURS, SPARK_LEN } from "./constants";
 import { useAuth } from "./auth";
 import { useT, LANGS } from "./i18n";
 import { useToast } from "./toast";
-import { listSessions, getHealth, getSession, downloadSessionPdf } from "./api";
+import { listSessions, getHealth, getSession, downloadSessionPdf, sharePdf } from "./api";
 
 export const EyeLogo = () => (
   <svg viewBox="0 0 24 24" fill="none">
@@ -797,6 +797,7 @@ export function SessionDetailModal({ session, onClose }) {
   const [data, setData] = useState(null);
   const [err, setErr] = useState(false);
   const [pdfBusy, setPdfBusy] = useState(false);
+  const [shareBusy, setShareBusy] = useState(false);
 
   useEffect(() => {
     if (!session) return undefined;
@@ -826,6 +827,24 @@ export function SessionDetailModal({ session, onClose }) {
       toast(t("detail.pdfError"), "error");
     } finally {
       setPdfBusy(false);
+    }
+  };
+
+  const shareReport = async () => {
+    setShareBusy(true);
+    try {
+      const result = await sharePdf(session.id);
+      if (result === "shared") {
+        toast(t("toast.shared"), "success");
+      } else if (result === "unsupported") {
+        // Browser can't share files — fall back to a download.
+        await downloadSessionPdf(session.id);
+        toast(t("toast.pdfDownloaded"), "success");
+      }
+    } catch (e) {
+      if (!e || e.message !== "cancelled") toast(t("detail.pdfError"), "error");
+    } finally {
+      setShareBusy(false);
     }
   };
 
@@ -859,9 +878,14 @@ export function SessionDetailModal({ session, onClose }) {
                 )}
               </div>
             </div>
-            <button className="btn btn-primary btn-block" onClick={downloadPdf} disabled={pdfBusy} style={{ marginTop: 16 }}>
-              {pdfBusy ? t("detail.preparing") : t("detail.downloadPdf")}
-            </button>
+            <div className="sdm-actions">
+              <button className="btn btn-primary" onClick={downloadPdf} disabled={pdfBusy}>
+                {pdfBusy ? t("detail.preparing") : t("detail.downloadPdf")}
+              </button>
+              <button className="btn btn-ghost" onClick={shareReport} disabled={shareBusy}>
+                {shareBusy ? t("detail.sharing") : t("detail.share")}
+              </button>
+            </div>
           </>
         )}
       </div>

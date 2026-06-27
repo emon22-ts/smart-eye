@@ -469,6 +469,9 @@ export const STYLES = `
 .help-disclaimer{font-size:12px;line-height:1.5;color:var(--muted);text-align:center;
   max-width:640px;margin:8px auto 0;padding:0 16px}
 @media(max-width:480px){.sdm{padding:22px 18px}.sdm-h{font-size:19px}}
+.sdm-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.sdm-actions .btn{flex:1 1 auto}
+@media(max-width:420px){.sdm-actions{flex-direction:column}.sdm-actions .btn{width:100%}}
 
 /* ---- Mobile polish (augments existing breakpoints) ---- */
 @media(max-width:560px){
