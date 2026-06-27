@@ -251,6 +251,16 @@ const DICT = {
   "detail.pdfError":    { en: "Could not generate the PDF.", bn: "PDF তৈরি করা যায়নি।" },
   "detail.close":       { en: "Close", bn: "বন্ধ করুন" },
   "toast.pdfDownloaded": { en: "Report downloaded", bn: "রিপোর্ট ডাউনলোড হয়েছে" },
+
+  // ---- history insights (placeholders {n} {c} {cls} filled at runtime) ----
+  "ins.title":    { en: "Insights", bn: "অন্তর্দৃষ্টি" },
+  "ins.single":   { en: "One screening recorded — run a few more to unlock trend insights.", bn: "একটি স্ক্রিনিং রেকর্ড হয়েছে — প্রবণতা অন্তর্দৃষ্টি আনলক করতে আরও কয়েকটি চালান।" },
+  "ins.ohiUp":    { en: "Your OHI improved {n} points across your last {c} screenings.", bn: "আপনার শেষ {c}টি স্ক্রিনিংয়ে আপনার OHI {n} পয়েন্ট উন্নত হয়েছে।" },
+  "ins.ohiDown":  { en: "Your OHI declined {n} points across your last {c} screenings.", bn: "আপনার শেষ {c}টি স্ক্রিনিংয়ে আপনার OHI {n} পয়েন্ট কমেছে।" },
+  "ins.ohiFlat":  { en: "Your OHI held steady across your last {c} screenings.", bn: "আপনার শেষ {c}টি স্ক্রিনিংয়ে আপনার OHI স্থির ছিল।" },
+  "ins.frequent": { en: "{cls} was your most frequent finding ({n} of {c} scans).", bn: "{cls} ছিল আপনার সবচেয়ে ঘন ঘন ফলাফল ({c}টির মধ্যে {n}টিতে)।" },
+  "ins.best":     { en: "Your best score so far is {n}.", bn: "এখন পর্যন্ত আপনার সেরা স্কোর {n}।" },
+  "ins.avgFatigue": { en: "Average fatigue across sessions: {n}/100.", bn: "সেশনগুলিতে গড় ক্লান্তি: {n}/100।" },
 };
 
 const LangCtx = createContext({ lang: "en", t: (k) => k, setLang: () => {} });

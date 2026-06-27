@@ -1,6 +1,6 @@
 // Session history — lists persisted screenings from /api/sessions (real backend).
 // Adds an OHI trend line, a fatigue column, and CSV export of all sessions.
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { listSessions, deleteSession } from "../api";
 import { COLOURS } from "../constants";
@@ -183,6 +183,35 @@ export default function History() {
     else { trendArrow = " \u2192"; }
   }
 
+  // Auto-generated narrative insights from the session history.
+  const insights = useMemo(() => {
+    const fill = (key, vals) => {
+      let s = t(key);
+      Object.entries(vals).forEach(([k, v]) => { s = s.replace(`{${k}}`, v); });
+      return s;
+    };
+    const out = [];
+    const vals = (rows || []).filter((r) => r.ohi != null); // newest-first
+    const n = vals.length;
+    if (n === 0) return out;
+    if (n === 1) { out.push(fill("ins.single", {})); return out; }
+    // OHI trend across the last up to 5 screenings
+    const win = vals.slice(0, Math.min(5, n));
+    const delta = Math.round(win[0].ohi - win[win.length - 1].ohi);
+    if (delta > 2) out.push(fill("ins.ohiUp", { n: delta, c: win.length }));
+    else if (delta < -2) out.push(fill("ins.ohiDown", { n: Math.abs(delta), c: win.length }));
+    else out.push(fill("ins.ohiFlat", { c: win.length }));
+    // Most frequent finding
+    const counts = {};
+    vals.forEach((r) => { if (r.top_class) counts[r.top_class] = (counts[r.top_class] || 0) + 1; });
+    const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+    if (top && top[1] >= 2) out.push(fill("ins.frequent", { cls: t(`class.${top[0]}`), n: top[1], c: n }));
+    // Best score so far
+    const best = Math.max(...vals.map((r) => r.ohi));
+    out.push(fill("ins.best", { n: Math.round(best) }));
+    return out;
+  }, [rows, t]);
+
   if (isGuest) {
     return (
       <main className="se-wrap page">
@@ -210,6 +239,21 @@ export default function History() {
       </div>
 
       {error && <div className="err-strip">{error}</div>}
+
+      {insights.length > 0 && (
+        <section className="card insights-card" style={{ marginBottom: 16 }}>
+          <div className="card-head">
+            <span className="eyebrow">{t("ins.title")}</span>
+          </div>
+          <ul className="insights-list">
+            {insights.map((line, i) => (
+              <li key={i} className="insight-item anim-up" style={{ animationDelay: `${i * 0.07}s` }}>
+                <span className="insight-dot" />{line}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {rows && rows.length > 0 && (
         <section className="card" style={{ marginBottom: 16 }}>

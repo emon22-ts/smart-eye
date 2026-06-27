@@ -382,6 +382,13 @@ export const STYLES = `
 .hist-row-click{cursor:pointer;transition:background .15s ease, border-color .15s ease}
 .hist-row-click:hover{background:var(--card-2);border-color:var(--border-2)}
 .hist-row-click:focus-visible{outline:2px solid var(--primary);outline-offset:-2px}
+
+/* History insights card */
+.insights-card{background:linear-gradient(180deg,var(--card),var(--card-2))}
+.insights-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:11px}
+.insight-item{display:flex;align-items:flex-start;gap:11px;font-size:14px;line-height:1.45;color:var(--fg)}
+.insight-dot{flex:0 0 auto;width:7px;height:7px;margin-top:7px;border-radius:50%;
+  background:var(--primary);box-shadow:0 0 0 4px rgba(59,130,246,.14)}
 @media(max-width:480px){.sdm{padding:22px 18px}.sdm-h{font-size:19px}}
 
 /* ---- Mobile polish (augments existing breakpoints) ---- */
