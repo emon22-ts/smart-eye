@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { AuthProvider } from "./auth";
 import { LangProvider } from "./i18n";
+import { ToastProvider } from "./toast";
 import App from "./App.jsx";
 
 const container = document.getElementById("root");
@@ -13,7 +14,9 @@ createRoot(container).render(
     <BrowserRouter>
       <AuthProvider>
         <LangProvider>
-          <App />
+          <ToastProvider>
+            <App />
+          </ToastProvider>
         </LangProvider>
       </AuthProvider>
     </BrowserRouter>

@@ -6,6 +6,7 @@ import { listSessions, deleteSession } from "../api";
 import { COLOURS } from "../constants";
 import { Met } from "../components";
 import { useT } from "../i18n";
+import { useToast } from "../toast";
 
 // Small self-contained OHI trend sparkline (0-100 scale, oldest -> newest).
 function OhiTrend({ values }) {
@@ -89,6 +90,7 @@ function CompareSessions({ rows }) {
 
 export default function History() {
   const { t } = useT();
+  const { toast } = useToast();
   const [rows, setRows] = useState(null);
   const [error, setError] = useState(null);
   const isGuest = typeof localStorage === "undefined" || !localStorage.getItem("se_token");
@@ -110,6 +112,7 @@ export default function History() {
     try {
       await deleteSession(id);
       setRows((rs) => (rs || []).filter((r) => r.id !== id));
+      toast(t("toast.deleted"), "info");
     } catch (e) {
       setError(`Could not delete session: ${e.message}`);
     }
@@ -152,6 +155,7 @@ export default function History() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    toast(t("toast.exported"), "success");
   };
 
   // OHI values oldest -> newest for the trend (backend returns newest first).

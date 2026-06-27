@@ -234,6 +234,12 @@ const DICT = {
   "amodal.login":       { en: "Log in", bn: "লগ ইন" },
   "amodal.signUp":      { en: "Sign up", bn: "সাইন আপ" },
   "amodal.signUpPrompt": { en: "Don't have an account?", bn: "অ্যাকাউন্ট নেই?" },
+
+  // ---- toast notifications ----
+  "toast.saved":        { en: "Saved to your history", bn: "আপনার ইতিহাসে সংরক্ষিত" },
+  "toast.scoreDone":    { en: "Screening complete", bn: "স্ক্রিনিং সম্পন্ন" },
+  "toast.deleted":      { en: "Session deleted", bn: "সেশন মুছে ফেলা হয়েছে" },
+  "toast.exported":     { en: "History exported as CSV", bn: "ইতিহাস CSV হিসেবে এক্সপোর্ট হয়েছে" },
 };
 
 const LangCtx = createContext({ lang: "en", t: (k) => k, setLang: () => {} });

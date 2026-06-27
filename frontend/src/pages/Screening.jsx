@@ -6,6 +6,7 @@ import { scoreSession, explainImage } from "../api";
 import { SYMPTOMS, DISCLAIMER, COLOURS } from "../constants";
 import { Banners, Dropzone, LikertRow, OHIGauge, ClassBars, WebcamCapture } from "../components";
 import { useT } from "../i18n";
+import { useToast } from "../toast";
 
 // Lightweight client-side guard: does this image plausibly look like a retinal
 // fundus photograph? Fundus images are strongly red-dominant (the retina) and
@@ -140,6 +141,7 @@ function BatchScreen() {
 
 export default function Screening({ isMock }) {
   const { t } = useT();
+  const { toast } = useToast();
   const fileInputRef = useRef(null);
   const [symptoms, setSymptoms] = useState({ pain: 1, redness: 1, photophobia: 1, blurred_vision: 1 });
   const [imageFile, setImageFile] = useState(null);
@@ -195,12 +197,13 @@ export default function Screening({ isMock }) {
       const data = await scoreSession({ file: imageFile, symptoms, fatigue: null });
       setResult(data);
       setGradcam(null);
+      toast(data.session_id != null ? t("toast.saved") : t("toast.scoreDone"), "success");
     } catch (e) {
       setError(`Screening failed — is the backend running on :8000? (${e.message})`);
     } finally {
       setScoring(false);
     }
-  }, [imageFile, symptoms]);
+  }, [imageFile, symptoms, toast, t]);
 
   // Low-confidence guard: if the top class probability is weak, flag the result
   // as uncertain rather than presenting a shaky guess as a screening outcome.
