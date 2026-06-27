@@ -240,6 +240,17 @@ const DICT = {
   "toast.scoreDone":    { en: "Screening complete", bn: "স্ক্রিনিং সম্পন্ন" },
   "toast.deleted":      { en: "Session deleted", bn: "সেশন মুছে ফেলা হয়েছে" },
   "toast.exported":     { en: "History exported as CSV", bn: "ইতিহাস CSV হিসেবে এক্সপোর্ট হয়েছে" },
+
+  // ---- session detail modal ----
+  "detail.title":       { en: "Screening detail", bn: "স্ক্রিনিং বিবরণ" },
+  "detail.loading":     { en: "Loading session…", bn: "সেশন লোড হচ্ছে…" },
+  "detail.loadError":   { en: "Could not load this session.", bn: "এই সেশনটি লোড করা যায়নি।" },
+  "detail.recorded":    { en: "Recorded", bn: "রেকর্ড করা হয়েছে" },
+  "detail.downloadPdf": { en: "Download full report (PDF)", bn: "সম্পূর্ণ রিপোর্ট ডাউনলোড করুন (PDF)" },
+  "detail.preparing":   { en: "Preparing…", bn: "প্রস্তুত হচ্ছে…" },
+  "detail.pdfError":    { en: "Could not generate the PDF.", bn: "PDF তৈরি করা যায়নি।" },
+  "detail.close":       { en: "Close", bn: "বন্ধ করুন" },
+  "toast.pdfDownloaded": { en: "Report downloaded", bn: "রিপোর্ট ডাউনলোড হয়েছে" },
 };
 
 const LangCtx = createContext({ lang: "en", t: (k) => k, setLang: () => {} });

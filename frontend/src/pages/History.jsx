@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { listSessions, deleteSession } from "../api";
 import { COLOURS } from "../constants";
-import { Met } from "../components";
+import { Met, SessionDetailModal } from "../components";
 import { useT } from "../i18n";
 import { useToast } from "../toast";
 
@@ -92,6 +92,7 @@ export default function History() {
   const { t } = useT();
   const { toast } = useToast();
   const [rows, setRows] = useState(null);
+  const [detailSession, setDetailSession] = useState(null);
   const [error, setError] = useState(null);
   const isGuest = typeof localStorage === "undefined" || !localStorage.getItem("se_token");
   const nav = useNavigate();
@@ -259,7 +260,8 @@ export default function History() {
               <span>{t("hist.colWhen")}</span><span>OHI</span><span>{t("hist.colRisk")}</span><span>{t("hist.colTop")}</span><span>{t("hist.colConf")}</span><span>{t("hist.colFat")}</span><span />
             </div>
             {rows.map((r) => (
-              <div className="hist-row hist-row-6" key={r.id}>
+              <div className="hist-row hist-row-6 hist-row-click" key={r.id} onClick={() => setDetailSession(r)} role="button" tabIndex={0}
+                   onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setDetailSession(r); } }}>
                 <span className="mono small">{new Date(r.created_at).toLocaleString()}</span>
                 <span className="mono" style={{ color: COLOURS[r.colour] || "var(--fg)", fontSize: 17 }}>
                   {r.ohi == null ? "—" : Math.round(r.ohi)}
@@ -275,12 +277,14 @@ export default function History() {
                 <span className="mono small">
                   {r.fatigue_score == null ? "—" : `${Math.round(r.fatigue_score)}/100`}
                 </span>
-                <span><button className="btn-icon" onClick={() => remove(r.id)} title={t("hist.deleteTitle")}>✕</button></span>
+                <span><button className="btn-icon" onClick={(e) => { e.stopPropagation(); remove(r.id); }} title={t("hist.deleteTitle")}>✕</button></span>
               </div>
             ))}
           </div>
         )}
       </section>
+
+      <SessionDetailModal session={detailSession} onClose={() => setDetailSession(null)} />
     </main>
   );
 }

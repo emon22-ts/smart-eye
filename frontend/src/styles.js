@@ -368,6 +368,22 @@ export const STYLES = `
 @media(max-width:480px){.toast-viewport{top:auto;bottom:18px;left:14px;right:14px;max-width:none}}
 @media(prefers-reduced-motion:reduce){.toast{animation:none}}
 
+/* Session detail modal */
+.sdm-overlay{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;
+  padding:24px;background:rgba(2,6,23,.66);backdrop-filter:blur(4px);animation:se-fade-in .2s ease both}
+.sdm{position:relative;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;
+  background:var(--card);border:1px solid var(--border-2);border-radius:18px;padding:26px 26px 30px;
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.7)}
+.sdm-x{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:9px;border:1px solid var(--border-2);
+  background:var(--card-2);color:var(--muted);cursor:pointer;font-size:15px;line-height:1;transition:.15s}
+.sdm-x:hover{color:var(--fg);border-color:var(--primary)}
+.sdm-h{margin:0 0 4px;font-size:21px}
+.sdm-sub{margin:0 0 20px;color:var(--muted);font-size:13px}
+.hist-row-click{cursor:pointer;transition:background .15s ease, border-color .15s ease}
+.hist-row-click:hover{background:var(--card-2);border-color:var(--border-2)}
+.hist-row-click:focus-visible{outline:2px solid var(--primary);outline-offset:-2px}
+@media(max-width:480px){.sdm{padding:22px 18px}.sdm-h{font-size:19px}}
+
 /* ---- Mobile polish (augments existing breakpoints) ---- */
 @media(max-width:560px){
   .se-wrap{padding:0 16px}

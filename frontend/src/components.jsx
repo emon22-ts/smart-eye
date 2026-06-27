@@ -5,7 +5,8 @@ import { NavLink } from "react-router-dom";
 import { COLOURS, SPARK_LEN } from "./constants";
 import { useAuth } from "./auth";
 import { useT, LANGS } from "./i18n";
-import { listSessions, getHealth } from "./api";
+import { useToast } from "./toast";
+import { listSessions, getHealth, getSession, downloadSessionPdf } from "./api";
 
 export const EyeLogo = () => (
   <svg viewBox="0 0 24 24" fill="none">
@@ -768,5 +769,87 @@ export function Banners({ isMock, error }) {
         </p>
       </div>
     </>
+  );
+}
+
+// Session detail modal — re-opens a past screening's full result (gauge, disease
+// bars, recommendation) from its stored payload, with a PDF download. Opened by
+// clicking a row on the History page.
+export function SessionDetailModal({ session, onClose }) {
+  const { t } = useT();
+  const { toast } = useToast();
+  const [data, setData] = useState(null);
+  const [err, setErr] = useState(false);
+  const [pdfBusy, setPdfBusy] = useState(false);
+
+  useEffect(() => {
+    if (!session) return undefined;
+    let alive = true;
+    setData(null);
+    setErr(false);
+    getSession(session.id)
+      .then((d) => { if (alive) { if (d && !d.error) setData(d); else setErr(true); } })
+      .catch(() => { if (alive) setErr(true); });
+    return () => { alive = false; };
+  }, [session]);
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  if (!session) return null;
+
+  const downloadPdf = async () => {
+    setPdfBusy(true);
+    try {
+      await downloadSessionPdf(session.id);
+      toast(t("toast.pdfDownloaded"), "success");
+    } catch (e) {
+      toast(t("detail.pdfError"), "error");
+    } finally {
+      setPdfBusy(false);
+    }
+  };
+
+  return createPortal(
+    <div className="sdm-overlay" onClick={onClose}>
+      <div className="sdm anim-pop" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+        <button className="sdm-x" onClick={onClose} aria-label={t("detail.close")}>✕</button>
+        <h2 className="sdm-h">{t("detail.title")}</h2>
+        <p className="sdm-sub">{t("detail.recorded")}: {new Date(session.created_at).toLocaleString()}</p>
+
+        {!data && !err && (
+          <div className="skel-wrap" aria-busy="true" aria-label={t("detail.loading")}>
+            <div className="skel skel-row" /><div className="skel skel-row" /><div className="skel skel-row" />
+          </div>
+        )}
+        {err && <p className="muted">{t("detail.loadError")}</p>}
+        {data && (
+          <>
+            <div className="result-grid">
+              <OHIGauge ohi={data.ohi?.ohi} band={data.ohi?.band} colour={data.ohi?.colour} />
+              <div className="result-detail">
+                <div className="sub-lbl">{t("screen.diseaseProbs")}</div>
+                <ClassBars probabilities={data.disease?.probabilities} topClass={data.disease?.top_class} />
+                {data.recommendation?.actions?.length > 0 && (
+                  <>
+                    <div className="sub-lbl">{t("screen.recSteps")}</div>
+                    <ul className="actions">
+                      {data.recommendation.actions.map((a, i) => <li key={i}>{a}</li>)}
+                    </ul>
+                  </>
+                )}
+              </div>
+            </div>
+            <button className="btn btn-primary btn-block" onClick={downloadPdf} disabled={pdfBusy} style={{ marginTop: 16 }}>
+              {pdfBusy ? t("detail.preparing") : t("detail.downloadPdf")}
+            </button>
+          </>
+        )}
+      </div>
+    </div>,
+    document.body
   );
 }
