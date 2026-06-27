@@ -261,6 +261,16 @@ const DICT = {
   "ins.frequent": { en: "{cls} was your most frequent finding ({n} of {c} scans).", bn: "{cls} ছিল আপনার সবচেয়ে ঘন ঘন ফলাফল ({c}টির মধ্যে {n}টিতে)।" },
   "ins.best":     { en: "Your best score so far is {n}.", bn: "এখন পর্যন্ত আপনার সেরা স্কোর {n}।" },
   "ins.avgFatigue": { en: "Average fatigue across sessions: {n}/100.", bn: "সেশনগুলিতে গড় ক্লান্তি: {n}/100।" },
+
+  // ---- history search & filter ----
+  "filter.search":      { en: "Search by finding or date…", bn: "ফলাফল বা তারিখ দিয়ে খুঁজুন…" },
+  "filter.allRisks":    { en: "All risk levels", bn: "সব ঝুঁকির স্তর" },
+  "filter.riskLow":     { en: "Low risk", bn: "নিম্ন ঝুঁকি" },
+  "filter.riskModerate": { en: "Moderate risk", bn: "মাঝারি ঝুঁকি" },
+  "filter.riskHigh":    { en: "High risk", bn: "উচ্চ ঝুঁকি" },
+  "filter.showing":     { en: "Showing {n} of {c}", bn: "{c}টির মধ্যে {n}টি দেখানো হচ্ছে" },
+  "filter.noMatch":     { en: "No sessions match your search.", bn: "আপনার অনুসন্ধানের সাথে কোনো সেশন মেলে না।" },
+  "filter.clear":       { en: "Clear", bn: "মুছুন" },
 };
 
 const LangCtx = createContext({ lang: "en", t: (k) => k, setLang: () => {} });

@@ -93,6 +93,8 @@ export default function History() {
   const { toast } = useToast();
   const [rows, setRows] = useState(null);
   const [detailSession, setDetailSession] = useState(null);
+  const [query, setQuery] = useState("");
+  const [riskFilter, setRiskFilter] = useState("all");
   const [error, setError] = useState(null);
   const isGuest = typeof localStorage === "undefined" || !localStorage.getItem("se_token");
   const nav = useNavigate();
@@ -212,6 +214,22 @@ export default function History() {
     return out;
   }, [rows, t]);
 
+  // Live search + risk-band filter over the records table.
+  const filteredRows = useMemo(() => {
+    if (!rows) return rows;
+    const q = query.trim().toLowerCase();
+    const colourFor = { low: "green", moderate: "amber", high: "red" };
+    return rows.filter((r) => {
+      if (riskFilter !== "all" && r.colour !== colourFor[riskFilter]) return false;
+      if (!q) return true;
+      const raw = (r.top_class || "").toLowerCase();
+      const translated = (r.top_class ? t(`class.${r.top_class}`) : "").toLowerCase();
+      const date = new Date(r.created_at).toLocaleString().toLowerCase();
+      const band = (r.band || "").toLowerCase();
+      return raw.includes(q) || translated.includes(q) || date.includes(q) || band.includes(q);
+    });
+  }, [rows, query, riskFilter, t]);
+
   if (isGuest) {
     return (
       <main className="se-wrap page">
@@ -292,18 +310,44 @@ export default function History() {
           )}
         </div>
 
+        {rows && rows.length > 0 && (
+          <div className="hist-filters">
+            <div className="hist-search">
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t("filter.search")}
+                aria-label={t("filter.search")}
+              />
+              {query && <button type="button" className="hist-search-clear" onClick={() => setQuery("")} aria-label={t("filter.clear")}>✕</button>}
+            </div>
+            <select className="hist-risk-select" value={riskFilter} onChange={(e) => setRiskFilter(e.target.value)} aria-label={t("filter.allRisks")}>
+              <option value="all">{t("filter.allRisks")}</option>
+              <option value="low">{t("filter.riskLow")}</option>
+              <option value="moderate">{t("filter.riskModerate")}</option>
+              <option value="high">{t("filter.riskHigh")}</option>
+            </select>
+            <span className="hist-count muted small">
+              {t("filter.showing").replace("{n}", (filteredRows || []).length).replace("{c}", rows.length)}
+            </span>
+          </div>
+        )}
+
         {rows === null ? (
           <div className="skel-wrap" aria-busy="true" aria-label={t("hist.loading")}>
             <div className="skel skel-row" /><div className="skel skel-row" /><div className="skel skel-row" /><div className="skel skel-row" />
           </div>
         ) : rows.length === 0 ? (
           <p className="muted">{t("hist.empty")}</p>
+        ) : filteredRows.length === 0 ? (
+          <p className="muted">{t("filter.noMatch")}</p>
         ) : (
           <div className="hist">
             <div className="hist-head hist-head-6">
               <span>{t("hist.colWhen")}</span><span>OHI</span><span>{t("hist.colRisk")}</span><span>{t("hist.colTop")}</span><span>{t("hist.colConf")}</span><span>{t("hist.colFat")}</span><span />
             </div>
-            {rows.map((r) => (
+            {filteredRows.map((r) => (
               <div className="hist-row hist-row-6 hist-row-click" key={r.id} onClick={() => setDetailSession(r)} role="button" tabIndex={0}
                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setDetailSession(r); } }}>
                 <span className="mono small">{new Date(r.created_at).toLocaleString()}</span>

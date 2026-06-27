@@ -389,6 +389,21 @@ export const STYLES = `
 .insight-item{display:flex;align-items:flex-start;gap:11px;font-size:14px;line-height:1.45;color:var(--fg)}
 .insight-dot{flex:0 0 auto;width:7px;height:7px;margin-top:7px;border-radius:50%;
   background:var(--primary);box-shadow:0 0 0 4px rgba(59,130,246,.14)}
+
+/* History search & filter bar */
+.hist-filters{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px}
+.hist-search{position:relative;flex:1 1 240px;min-width:200px}
+.hist-search input{width:100%;padding:9px 32px 9px 12px;border-radius:10px;border:1px solid var(--border-2);
+  background:var(--card-2);color:var(--fg);font-family:inherit;font-size:13.5px}
+.hist-search input:focus{outline:none;border-color:var(--primary)}
+.hist-search-clear{position:absolute;top:50%;right:8px;transform:translateY(-50%);width:20px;height:20px;
+  border:none;background:transparent;color:var(--muted);cursor:pointer;font-size:13px;line-height:1}
+.hist-search-clear:hover{color:var(--fg)}
+.hist-risk-select{padding:9px 12px;border-radius:10px;border:1px solid var(--border-2);
+  background:var(--card-2);color:var(--fg);font-family:inherit;font-size:13.5px;cursor:pointer}
+.hist-risk-select:focus{outline:none;border-color:var(--primary)}
+.hist-count{margin-left:auto;white-space:nowrap}
+@media(max-width:480px){.hist-count{margin-left:0;width:100%}}
 @media(max-width:480px){.sdm{padding:22px 18px}.sdm-h{font-size:19px}}
 
 /* ---- Mobile polish (augments existing breakpoints) ---- */
