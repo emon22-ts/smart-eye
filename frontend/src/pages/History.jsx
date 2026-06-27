@@ -244,7 +244,9 @@ export default function History() {
         </div>
 
         {rows === null ? (
-          <p className="muted">{t("hist.loading")}</p>
+          <div className="skel-wrap" aria-busy="true" aria-label={t("hist.loading")}>
+            <div className="skel skel-row" /><div className="skel skel-row" /><div className="skel skel-row" /><div className="skel skel-row" />
+          </div>
         ) : rows.length === 0 ? (
           <p className="muted">{t("hist.empty")}</p>
         ) : (

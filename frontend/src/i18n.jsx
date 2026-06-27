@@ -97,6 +97,7 @@ const DICT = {
   "screen.resultEyebrow": { en: "Result", bn: "ফলাফল" },
   "screen.mockStrip":   { en: "Mock model — placeholder probabilities, not a screening result.", bn: "মক মডেল — স্থানধারক সম্ভাবনা, কোনো স্ক্রিনিং ফলাফল নয়।" },
   "screen.diseaseProbs": { en: "Disease probabilities", bn: "রোগের সম্ভাবনা" },
+  "screen.noFundusBars": { en: "No fundus image submitted — disease screening skipped.", bn: "কোনো ফান্ডাস ছবি জমা দেওয়া হয়নি — রোগ স্ক্রিনিং বাদ দেওয়া হয়েছে।" },
   "screen.recSteps":    { en: "Recommended next steps", bn: "প্রস্তাবিত পরবর্তী পদক্ষেপ" },
   "screen.lowConf":     { en: "Low model confidence", bn: "মডেলের আত্মবিশ্বাস কম" },
   "screen.lowConfTail": { en: "This result is uncertain — treat it with extra caution and prioritise professional review.", bn: "এই ফলাফলটি অনিশ্চিত — অতিরিক্ত সতর্কতার সাথে নিন এবং পেশাদার পর্যালোচনাকে অগ্রাধিকার দিন।" },

@@ -28,12 +28,31 @@ export function IrisVisual() {
 }
 
 // Colour-banded circular Ocular Health Index gauge (ring + mono number + badge).
+// Animate a number from 0 to target with an ease-out curve (for the OHI gauge).
+function useCountUp(target, ms = 750) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    let raf;
+    const start = performance.now();
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / ms);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setVal(target * eased);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, ms]);
+  return val;
+}
+
 export function OHIGauge({ ohi, band, colour }) {
   const size = 168;
   const stroke = 14;
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(100, Number(ohi) || 0));
+  const shown = useCountUp(pct);
   const offset = c * (1 - pct / 100);
   const color = COLOURS[colour] || "#64748b";
   return (
@@ -51,11 +70,11 @@ export function OHIGauge({ ohi, band, colour }) {
           strokeDasharray={c}
           strokeDashoffset={offset}
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          style={{ transition: "stroke-dashoffset .6s ease, stroke .3s ease" }}
+          style={{ transition: "stroke-dashoffset .7s cubic-bezier(.22,1,.36,1), stroke .3s ease" }}
         />
         <text x="50%" y="44%" textAnchor="middle" dominantBaseline="middle"
               style={{ fill: color, fontFamily: "var(--mono)", fontSize: 42, fontWeight: 600 }}>
-          {Math.round(pct)}
+          {Math.round(shown)}
         </text>
         <text x="50%" y="62%" textAnchor="middle" dominantBaseline="middle"
               style={{ fill: "var(--muted-2)", fontSize: 11, letterSpacing: 1 }}>
@@ -71,9 +90,10 @@ export function OHIGauge({ ohi, band, colour }) {
 
 // Per-class probability bars for the 4-class fundus taxonomy.
 export function ClassBars({ probabilities, topClass }) {
+  const { t } = useT();
   const entries = Object.entries(probabilities || {});
   if (entries.length === 0) {
-    return <p className="muted small">No fundus image submitted — disease screening skipped.</p>;
+    return <p className="muted small">{t("screen.noFundusBars")}</p>;
   }
   entries.sort((a, b) => b[1] - a[1]);
   return (
@@ -84,7 +104,7 @@ export function ClassBars({ probabilities, topClass }) {
         return (
           <div className="pred" key={name}>
             <div className="pred-top">
-              <b>{name.replace(/_/g, " ")}</b>
+              <b>{t(`class.${name}`)}</b>
               <span className="mono" style={{ color: isTop ? "#7dd3fc" : "var(--muted)" }}>{pct}%</span>
             </div>
             <div className="bar"><i style={{ width: `${pct}%`, opacity: isTop ? 1 : 0.5 }} /></div>

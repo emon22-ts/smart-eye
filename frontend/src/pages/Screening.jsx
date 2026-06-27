@@ -252,7 +252,7 @@ export default function Screening({ isMock }) {
               <p>{t("screen.ghostText")}</p>
             </div>
           ) : (
-            <div className="result-live">
+            <div className="result-live anim-up">
               <div className="card-head">
                 <span className="eyebrow">{t("screen.resultEyebrow")}</span><h3>{t("screen.resultTitle")}</h3>
                 {typeof result.latency_ms === "number" && <span className="muted small mono">{result.latency_ms} ms</span>}

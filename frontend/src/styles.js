@@ -297,6 +297,77 @@ export const STYLES = `
 .theme-light .nav-mobile{background:rgba(255,255,255,.97)}
 .theme-light .nav-mobile a.active{background:rgba(59,130,246,.12);color:var(--primary)}
 
+/* ============ Polish layer: animations, hover, skeletons, mobile ============ */
+/* Entrance animations */
+@keyframes se-fade-up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes se-fade-in{from{opacity:0}to{opacity:1}}
+@keyframes se-pop{0%{opacity:0;transform:scale(.94)}60%{transform:scale(1.01)}100%{opacity:1;transform:scale(1)}}
+@keyframes se-shimmer{0%{background-position:-468px 0}100%{background-position:468px 0}}
+
+.anim-up{animation:se-fade-up .5s cubic-bezier(.22,1,.36,1) both}
+.anim-in{animation:se-fade-in .5s ease both}
+.page{animation:se-fade-in .45s ease both}
+.anim-pop{animation:se-pop .45s cubic-bezier(.22,1,.36,1) both}
+.anim-d1{animation-delay:.06s}
+.anim-d2{animation-delay:.14s}
+.anim-d3{animation-delay:.22s}
+.anim-d4{animation-delay:.3s}
+@media(prefers-reduced-motion:reduce){
+  .anim-up,.anim-in,.anim-pop,.page{animation:none}
+  .bar i{animation:none;transform:none}
+}
+
+/* Result reveal: stagger the hero pieces */
+.result-live .result-grid{animation:se-fade-up .55s cubic-bezier(.22,1,.36,1) both;animation-delay:.05s}
+.result-live .gradcam-panel{animation:se-fade-up .55s cubic-bezier(.22,1,.36,1) both;animation-delay:.12s}
+.result-live .lowconf-note{animation:se-fade-in .5s ease both;animation-delay:.18s}
+
+/* Disease bars grow smoothly */
+@keyframes se-bar-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.bar i{transform-origin:left center;animation:se-bar-grow .8s cubic-bezier(.22,1,.36,1) both;animation-delay:.15s}
+
+/* Hover lifts (cards, feature tiles, buttons) */
+.card{transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease}
+.feat-card,.platform .feat-card{transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease}
+.feat-card:hover{transform:translateY(-4px);box-shadow:0 18px 40px -22px rgba(0,0,0,.6);border-color:var(--border-2)}
+.btn{transition:transform .14s ease, box-shadow .18s ease, background .18s ease, opacity .18s ease}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn:active:not(:disabled){transform:translateY(0) scale(.985)}
+.btn-primary:hover:not(:disabled){box-shadow:0 10px 26px -10px rgba(59,130,246,.7)}
+.met{transition:transform .18s ease, border-color .18s ease}
+.met:hover{transform:translateY(-2px);border-color:var(--border-2)}
+.gc-class{transition:transform .14s ease, border-color .15s ease, background .15s ease}
+.gc-class:hover:not(:disabled){transform:translateY(-1px)}
+.lang-switch{transition:transform .14s ease, color .15s ease, border-color .15s ease, background .15s ease}
+.lang-switch:hover{transform:translateY(-1px)}
+
+/* Loading skeletons */
+.skel{position:relative;overflow:hidden;background:var(--card-2);border-radius:8px}
+.skel::after{content:"";position:absolute;inset:0;transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(148,163,184,.12),transparent);
+  animation:se-shimmer 1.3s infinite}
+.skel-row{height:46px;margin-bottom:8px;border-radius:10px}
+.skel-line{height:12px;border-radius:6px;margin:7px 0}
+.skel-wrap{padding:6px 0}
+
+/* ---- Mobile polish (augments existing breakpoints) ---- */
+@media(max-width:560px){
+  .se-wrap{padding:0 16px}
+  .hero-btns{flex-direction:column;align-items:stretch}
+  .hero-btns .btn{width:100%}
+  .trust{gap:8px 14px}
+  .result-actions{flex-direction:column;align-items:stretch}
+  .result-actions .btn{width:100%}
+  .batch-controls{flex-direction:column;align-items:stretch}
+  .batch-controls .btn{width:100%}
+}
+@media(max-width:480px){
+  .amodal{width:calc(100vw - 28px);padding:24px 18px}
+  .amodal-h{font-size:21px}
+  .page-h{font-size:21px}
+  .gauge svg{width:148px;height:148px}
+}
+
 /* Print / export report */
 @media print{
   @page{margin:14mm}
