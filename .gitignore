@@ -33,3 +33,4 @@ node_modules/
 # ---- Runtime artifacts ----
 /tmp/
 *.tmp
+smart_eye/persistence/session_images/
