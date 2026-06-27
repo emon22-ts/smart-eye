@@ -47,10 +47,10 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-function Shell({ isMock, theme, onToggleTheme, isAuthed }) {
+function Shell({ isMock, theme, onToggleTheme, a11y, onToggleA11y, isAuthed }) {
   return (
     <>
-      <NavBar isMock={isMock} theme={theme} onToggleTheme={onToggleTheme} />
+      <NavBar isMock={isMock} theme={theme} onToggleTheme={onToggleTheme} a11y={a11y} onToggleA11y={onToggleA11y} />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/screening" element={<Screening isMock={isMock} />} />
@@ -72,6 +72,9 @@ export default function App() {
   const [theme, setTheme] = useState(
     () => (typeof localStorage !== "undefined" && localStorage.getItem("se_theme")) || "dark"
   );
+  const [a11y, setA11y] = useState(
+    () => (typeof localStorage !== "undefined" && localStorage.getItem("se_a11y") === "1")
+  );
 
   useEffect(() => {
     getHealth().then((h) => setIsMock(!!h.is_mock)).catch(() => {});
@@ -85,15 +88,23 @@ export default function App() {
     });
   };
 
+  const toggleA11y = () => {
+    setA11y((v) => {
+      const next = !v;
+      try { localStorage.setItem("se_a11y", next ? "1" : "0"); } catch { /* ignore */ }
+      return next;
+    });
+  };
+
   return (
-    <div className={`se-app${theme === "light" ? " theme-light" : ""}`}>
+    <div className={`se-app${theme === "light" ? " theme-light" : ""}${a11y ? " a11y" : ""}`}>
       <style>{STYLES}</style>
       <Backdrop />
       {!ready ? (
         <div className="boot"><div className="boot-spin" />Loading…</div>
       ) : (
         <ErrorBoundary>
-          <Shell isMock={isMock} theme={theme} onToggleTheme={toggleTheme} isAuthed={isAuthed} />
+          <Shell isMock={isMock} theme={theme} onToggleTheme={toggleTheme} a11y={a11y} onToggleA11y={toggleA11y} isAuthed={isAuthed} />
         </ErrorBoundary>
       )}
     </div>

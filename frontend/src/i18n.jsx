@@ -21,6 +21,7 @@ const DICT = {
   "nav.history":        { en: "History", bn: "ইতিহাস" },
   "nav.analytics":      { en: "Analytics", bn: "বিশ্লেষণ" },
   "nav.help":           { en: "Help", bn: "সাহায্য" },
+  "a11y.toggle":        { en: "Accessibility mode (larger text & higher contrast)", bn: "অ্যাক্সেসিবিলিটি মোড (বড় টেক্সট ও উচ্চ কনট্রাস্ট)" },
   "nav.signIn":         { en: "Sign in", bn: "সাইন ইন" },
   "nav.signOut":        { en: "Sign out", bn: "সাইন আউট" },
 

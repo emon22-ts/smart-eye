@@ -665,7 +665,7 @@ export function AuthModal({ open, onClose }) {
   );
 }
 
-export function NavBar({ isMock, theme, onToggleTheme }) {
+export function NavBar({ isMock, theme, onToggleTheme, a11y, onToggleA11y }) {
   const { user } = useAuth();
   const { t, lang, setLang } = useT();
   const [authOpen, setAuthOpen] = useState(false);
@@ -699,6 +699,18 @@ export function NavBar({ isMock, theme, onToggleTheme }) {
           </span>
           <ThemeToggle theme={theme} onToggle={onToggleTheme} />
           <NotificationsBell isMock={isMock} />
+          <button
+            className={`a11y-toggle${a11y ? " on" : ""}`}
+            onClick={onToggleA11y}
+            aria-pressed={a11y ? "true" : "false"}
+            aria-label={t("a11y.toggle")}
+            title={t("a11y.toggle")}
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="4" r="1.6" fill="currentColor" stroke="none" />
+              <path d="M5 8h14M12 8v8M12 12l-3.5 5M12 12l3.5 5" />
+            </svg>
+          </button>
           <button className="lang-switch" onClick={() => setLang(lang === "en" ? "bn" : "en")} aria-label="Switch language" title="Switch language">
             {(LANGS.find((l) => l.code !== lang) || LANGS[0]).label}
           </button>

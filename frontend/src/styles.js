@@ -89,6 +89,26 @@ export const STYLES = `
 .gradcam-classes{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .lang-switch{font-family:inherit;font-size:12px;font-weight:600;min-width:46px;padding:7px 11px;border-radius:9px;border:1px solid var(--border-2);background:var(--card-2);color:var(--muted);cursor:pointer;transition:.15s;white-space:nowrap}
 .lang-switch:hover{color:var(--fg);border-color:var(--primary)}
+.a11y-toggle{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9px;border:1px solid var(--border-2);background:var(--card-2);color:var(--muted);cursor:pointer;transition:.15s}
+.a11y-toggle:hover{color:var(--fg);border-color:var(--primary)}
+.a11y-toggle.on{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* Accessibility mode: larger text, higher contrast, strong focus rings */
+.se-app.a11y{--muted:#CBD5E1;--muted-2:#A3B2C7;--border:#3E4F6F;--border-2:#5C6E8C}
+.se-app.a11y.theme-light{--muted:#1E293B;--muted-2:#334155;--border:#94A3B8;--border-2:#64748B}
+.se-app.a11y{font-size:16.5px}
+.se-app.a11y p,.se-app.a11y li{font-size:15.5px;line-height:1.65}
+.se-app.a11y .small,.se-app.a11y .muted.small,.se-app.a11y .batch-row,.se-app.a11y .pill{font-size:13.5px}
+.se-app.a11y .nav-links a{font-size:15px}
+.se-app.a11y .lead{font-size:17.5px;line-height:1.7}
+.se-app.a11y .btn{font-size:15px}
+.se-app.a11y input,.se-app.a11y select,.se-app.a11y textarea{font-size:15px}
+.se-app.a11y .page-h{font-size:30px}
+.se-app.a11y h3{font-size:18px}
+.se-app.a11y .help-cond-what,.se-app.a11y .help-tip p,.se-app.a11y .help-step p,.se-app.a11y .help-cond-meta,.se-app.a11y .insight-item{font-size:14.5px}
+.se-app.a11y .muted{font-weight:500}
+.se-app.a11y :focus-visible{outline:3px solid var(--primary)!important;outline-offset:2px!important;border-radius:5px}
+.se-app.a11y .card,.se-app.a11y .help-cond,.se-app.a11y .help-step{border-width:1.5px}
 .gc-class{font-family:inherit;font-size:11.5px;font-weight:500;padding:6px 11px;border-radius:8px;border:1px solid var(--border-2);background:var(--card-2);color:var(--muted);cursor:pointer;transition:.15s;text-transform:capitalize}
 .gc-class:hover:not(:disabled){color:var(--fg);border-color:var(--primary)}
 .gc-class.on{background:rgba(59,130,246,.14);color:#fff;border-color:var(--primary)}
