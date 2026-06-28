@@ -37,6 +37,15 @@ const DICT = {
   "home.feat3":         { en: "Explainable Results", bn: "ব্যাখ্যাযোগ্য ফলাফল" },
   "home.feat4":         { en: "GDPR-Compliant Local Processing", bn: "জিডিপিআর-সম্মত স্থানীয় প্রসেসিং" },
 
+  // ---- home v2: hero heading (gradient accent) + stat band labels ----
+  "home.heroPre":       { en: "Intelligent eye ", bn: "সবার জন্য বুদ্ধিমান চোখ " },
+  "home.heroAccent":    { en: "screening", bn: "স্ক্রিনিং" },
+  "home.heroPost":      { en: " for everyone", bn: "" },
+  "home.stat1":         { en: "Fundus model accuracy", bn: "ফান্ডাস মডেল নির্ভুলতা" },
+  "home.stat2":         { en: "Disease classes detected", bn: "শনাক্তকৃত রোগ শ্রেণি" },
+  "home.stat3":         { en: "Real-time landmark rate", bn: "রিয়েল-টাইম ল্যান্ডমার্ক রেট" },
+  "home.stat4":         { en: "Inference time", bn: "ইনফারেন্স সময়" },
+
   // ---- home: platform section + feature cards ----
   "home.plat.eyebrow":  { en: "The Platform", bn: "প্ল্যাটফর্ম" },
   "home.plat.title":    { en: "A complete preliminary screening pipeline", bn: "একটি সম্পূর্ণ প্রাথমিক স্ক্রিনিং পাইপলাইন" },
