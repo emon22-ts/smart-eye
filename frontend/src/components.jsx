@@ -673,7 +673,7 @@ export function AuthModal({ open, onClose }) {
 }
 
 export function NavBar({ isMock, theme, onToggleTheme, a11y, onToggleA11y }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { t, lang, setLang } = useT();
   const [authOpen, setAuthOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -742,11 +742,37 @@ export function NavBar({ isMock, theme, onToggleTheme, a11y, onToggleA11y }) {
           <NavLink to="/history" onClick={closeMenu}>{t("nav.history")}</NavLink>
           <NavLink to="/analytics" onClick={closeMenu}>{t("nav.analytics")}</NavLink>
           <NavLink to="/help" onClick={closeMenu}>{t("nav.help")}</NavLink>
+          {user && <NavLink to="/profile" onClick={closeMenu}>{t("profile.menuLink")}</NavLink>}
+
+          <div className="nav-mobile-controls">
+            <button className="lang-switch" onClick={() => setLang(lang === "en" ? "bn" : "en")} aria-label="Switch language">
+              {(LANGS.find((l) => l.code !== lang) || LANGS[0]).label}
+            </button>
+            <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+            <button
+              className={`a11y-toggle${a11y ? " on" : ""}`}
+              onClick={onToggleA11y}
+              aria-pressed={a11y ? "true" : "false"}
+              aria-label={t("a11y.toggle")}
+              title={t("a11y.toggle")}
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="4" r="1.6" fill="currentColor" stroke="none" />
+                <path d="M5 8h14M12 8v8M12 12l-3.5 5M12 12l3.5 5" />
+              </svg>
+            </button>
+            <NotificationsBell isMock={isMock} />
+          </div>
+
           <div className="nav-mobile-foot">
             <span className={`pill pill-sm ${modelPill.cls}`}>
               <span className="dot" />{modelPill.txt}
             </span>
-            {!user && (
+            {user ? (
+              <button className="se-signin" onClick={() => { logout(); closeMenu(); }}>
+                {t("nav.signOut")}
+              </button>
+            ) : (
               <button className="se-signin" onClick={() => { setAuthOpen(true); closeMenu(); }}>
                 {t("nav.signIn")}
               </button>

@@ -313,6 +313,7 @@ export const STYLES = `
   .nav-mobile a{font-size:15px;font-weight:500;color:var(--muted);text-decoration:none;padding:13px 12px;border-radius:10px}
   .nav-mobile a.active{color:#fff;background:rgba(59,130,246,.14)}
   .nav-mobile-foot{display:flex;align-items:center;gap:12px;margin-top:8px;padding:12px 12px 0;border-top:1px solid var(--border)}
+  .nav-mobile-controls{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:8px;padding:12px 12px 0;border-top:1px solid var(--border)}
 }
 .theme-light .nav-mobile{background:rgba(255,255,255,.97)}
 .theme-light .nav-mobile a.active{background:rgba(59,130,246,.12);color:var(--primary)}
@@ -640,7 +641,7 @@ export const STYLES = `
 
 /* ===== Home v2 — hero + stats band (theme-aware) ===== */
 .v2-hero{display:grid;grid-template-columns:1fr 400px;gap:32px;align-items:center;padding:72px 0 56px}
-@media(max-width:900px){.v2-hero{grid-template-columns:1fr;padding:48px 0 36px}.v2-hero-visual{display:none}}
+@media(max-width:900px){.v2-hero{grid-template-columns:1fr;padding:48px 0 36px}.v2-hero-visual{display:flex;justify-content:center;margin-top:6px}.v2-iris-card{width:100%;max-width:340px}}
 .v2-eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
 .v2-eyebrow-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);flex-shrink:0}
 .v2-hero-h{font-size:52px;font-weight:600;letter-spacing:-.04em;line-height:1.05;color:var(--fg)}
