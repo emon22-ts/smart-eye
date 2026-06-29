@@ -743,4 +743,26 @@ export const STYLES = `
 @media(prefers-reduced-motion:reduce){
   .v2-eyebrow-dot,.v2-hero-visual::before,.orb.a,.orb.b{animation:none}
 }
+
+/* ===== result page polish (theme-aware) ===== */
+.gauge-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.gauge-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:128px;height:128px;border-radius:50%;filter:blur(24px);z-index:0;pointer-events:none;animation:se-iris-glow 5s ease-in-out infinite}
+.gauge-wrap svg{position:relative;z-index:1}
+.gauge-track{stroke:#1e293b}
+.theme-light .gauge-track{stroke:#E2E8F0}
+.bar{height:8px;border-radius:4px}
+.bar i{border-radius:4px}
+.pred{transition:border-color .2s ease,background .2s ease}
+.pred.is-top{border-color:rgba(34,211,238,.4);background:linear-gradient(180deg,rgba(34,211,238,.07),transparent)}
+.pred.is-top .bar i{box-shadow:0 0 9px rgba(34,211,238,.55)}
+.theme-light .pred.is-top{border-color:rgba(6,182,212,.4);background:linear-gradient(180deg,rgba(6,182,212,.08),transparent)}
+.gradcam-img{box-shadow:0 14px 32px rgba(8,12,28,.38)}
+.theme-light .gradcam-img{box-shadow:0 8px 22px rgba(15,23,42,.12)}
+@media(prefers-reduced-motion:reduce){.gauge-glow{animation:none}}
+
+/* ===== auth gate panel (protected pages) ===== */
+.auth-gate{text-align:center;padding:52px 28px;max-width:580px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+.auth-gate-ic{width:62px;height:62px;border-radius:16px;display:grid;place-items:center;margin-bottom:16px;color:var(--accent);background:linear-gradient(135deg,rgba(59,130,246,.2),rgba(6,182,212,.15));border:1px solid var(--border-2)}
+.auth-gate h3{font-size:21px;font-weight:600;margin:0 0 8px}
+.auth-gate .muted{max-width:440px;margin:0 auto 24px;line-height:1.65}
 `;

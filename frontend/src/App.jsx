@@ -6,7 +6,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { STYLES } from "./styles";
 import { getHealth } from "./api";
 import { useAuth } from "./auth";
-import { Backdrop, NavBar, Footer } from "./components";
+import { Backdrop, NavBar, Footer, AuthGate } from "./components";
 import Home from "./pages/Home.jsx";
 import Screening from "./pages/Screening.jsx";
 import Fatigue from "./pages/Fatigue.jsx";
@@ -54,12 +54,12 @@ function Shell({ isMock, theme, onToggleTheme, a11y, onToggleA11y, isAuthed }) {
       <NavBar isMock={isMock} theme={theme} onToggleTheme={onToggleTheme} a11y={a11y} onToggleA11y={onToggleA11y} />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/screening" element={<Screening isMock={isMock} />} />
-        <Route path="/fatigue" element={<Fatigue />} />
+        <Route path="/screening" element={<AuthGate eyebrowKey="screen.eyebrow" titleKey="screen.title"><Screening isMock={isMock} /></AuthGate>} />
+        <Route path="/fatigue" element={<AuthGate eyebrowKey="fat.eyebrow" titleKey="fat.title"><Fatigue /></AuthGate>} />
         <Route path="/history" element={<History />} />
-        <Route path="/analytics" element={<Analytics />} />
+        <Route path="/analytics" element={<AuthGate eyebrowKey="an.eyebrow" titleKey="an.title"><Analytics /></AuthGate>} />
         <Route path="/help" element={<Help />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<AuthGate eyebrowKey="profile.eyebrow" titleKey="profile.title"><Profile /></AuthGate>} />
         <Route path="/login" element={isAuthed ? <Navigate to="/" replace /> : <Login />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

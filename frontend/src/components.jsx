@@ -58,30 +58,33 @@ export function OHIGauge({ ohi, band, colour }) {
   const color = COLOURS[colour] || "#64748b";
   return (
     <div className="gauge">
-      <svg width={size} height={size} role="img" aria-label={`Ocular Health Index ${Math.round(pct)}`}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#1e293b" strokeWidth={stroke} />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke={color}
-          strokeWidth={stroke}
-          strokeLinecap="round"
-          strokeDasharray={c}
-          strokeDashoffset={offset}
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          style={{ transition: "stroke-dashoffset .7s cubic-bezier(.22,1,.36,1), stroke .3s ease" }}
-        />
-        <text x="50%" y="44%" textAnchor="middle" dominantBaseline="middle"
-              style={{ fill: color, fontFamily: "var(--mono)", fontSize: 42, fontWeight: 600 }}>
-          {Math.round(shown)}
-        </text>
-        <text x="50%" y="62%" textAnchor="middle" dominantBaseline="middle"
-              style={{ fill: "var(--muted-2)", fontSize: 11, letterSpacing: 1 }}>
-          OHI / 100
-        </text>
-      </svg>
+      <div className="gauge-wrap">
+        <span className="gauge-glow" style={{ background: `radial-gradient(circle, ${color}38, transparent 60%)` }} />
+        <svg width={size} height={size} role="img" aria-label={`Ocular Health Index ${Math.round(pct)}`}>
+          <circle className="gauge-track" cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            stroke={color}
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            strokeDasharray={c}
+            strokeDashoffset={offset}
+            transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            style={{ transition: "stroke-dashoffset .9s cubic-bezier(.22,1,.36,1), stroke .3s ease", filter: `drop-shadow(0 0 5px ${color})` }}
+          />
+          <text x="50%" y="44%" textAnchor="middle" dominantBaseline="middle"
+                style={{ fill: color, fontFamily: "var(--mono)", fontSize: 42, fontWeight: 600 }}>
+            {Math.round(shown)}
+          </text>
+          <text x="50%" y="62%" textAnchor="middle" dominantBaseline="middle"
+                style={{ fill: "var(--muted-2)", fontSize: 11, letterSpacing: 1 }}>
+            OHI / 100
+          </text>
+        </svg>
+      </div>
       <span className="risk-badge" style={{ color, borderColor: color, background: `${color}22` }}>
         {band || "—"} Risk
       </span>
@@ -103,7 +106,7 @@ export function ClassBars({ probabilities, topClass }) {
         const pct = (Number(p) * 100).toFixed(1);
         const isTop = name === topClass;
         return (
-          <div className="pred" key={name}>
+          <div className={`pred${isTop ? " is-top" : ""}`} key={name}>
             <div className="pred-top">
               <b>{t(`class.${name}`)}</b>
               <span className="mono" style={{ color: isTop ? "#7dd3fc" : "var(--muted)" }}>{pct}%</span>
@@ -469,36 +472,50 @@ export function UserMenu({ onSignIn }) {
 // blurred sticky nav. Includes Continue with Google (active once the backend
 // has OAuth credentials configured).
 const AUTH_MODAL_CSS = `
-.amodal-overlay{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,10,18,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:amfade .18s ease}
-.amodal{position:relative;width:min(400px,95vw);max-height:92vh;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.45);animation:amrise .22s cubic-bezier(.2,.8,.2,1);padding:34px 32px 28px;font-family:'Sora',system-ui,sans-serif}
-.amodal-x{position:absolute;top:13px;right:13px;width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:#9aa3b2;font-size:21px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:background .15s,color .15s}
-.amodal-x:hover{background:#f0f2f5;color:#3a4150}
+.amodal-overlay{
+  --am-card:#0f1729;--am-fg:#f1f5f9;--am-sub:#94a3b8;--am-muted:#7e8aa0;
+  --am-border:#283449;--am-input:#0b1322;--am-input-border:#2b3852;--am-x-hover:#1e293b;
+  --am-or:#283449;--am-err-bg:rgba(220,38,38,.13);--am-err-bd:rgba(248,113,113,.4);--am-err-fg:#fca5a5;
+  --am-ghost-hover:rgba(255,255,255,.05);
+  position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,10,18,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:amfade .18s ease}
+.amodal-overlay.am-light{
+  --am-card:#fff;--am-fg:#16202e;--am-sub:#697587;--am-muted:#9aa3b2;
+  --am-border:#e6e9ee;--am-input:#fff;--am-input-border:#d9dee6;--am-x-hover:#f0f2f5;
+  --am-or:#e6e9ee;--am-err-bg:#fef2f2;--am-err-bd:#fecaca;--am-err-fg:#dc2626;
+  --am-ghost-hover:#f7f9fc}
+.amodal{position:relative;width:min(400px,95vw);max-height:92vh;overflow:auto;background:var(--am-card);border:1px solid var(--am-border);border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.45);animation:amrise .22s cubic-bezier(.2,.8,.2,1);padding:34px 32px 28px;font-family:'Sora',system-ui,sans-serif}
+.amodal-x{position:absolute;top:13px;right:13px;width:30px;height:30px;border:0;border-radius:8px;background:transparent;color:var(--am-muted);font-size:21px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:background .15s,color .15s}
+.amodal-x:hover{background:var(--am-x-hover);color:var(--am-fg)}
 .amodal-logo{width:54px;height:54px;border-radius:14px;margin:0 auto 16px;display:grid;place-items:center;background:linear-gradient(135deg,#3B82F6,#06B6D4);box-shadow:0 8px 22px rgba(59,130,246,.35)}
 .amodal-logo svg{width:30px;height:30px}
-.amodal-h{margin:0;text-align:center;color:#16202e;font:700 23px/1.2 'Sora',sans-serif}
-.amodal-sub{margin:7px 0 22px;text-align:center;color:#697587;font:400 14px/1.45 'Sora',sans-serif}
-.amodal-err{background:#fef2f2;border:1px solid #fecaca;color:#dc2626;padding:10px 13px;border-radius:10px;font:500 12.5px/1.4 'Sora',sans-serif;margin-bottom:14px}
+.amodal-h{margin:0;text-align:center;color:var(--am-fg);font:700 23px/1.2 'Sora',sans-serif}
+.amodal-sub{margin:7px 0 22px;text-align:center;color:var(--am-sub);font:400 14px/1.45 'Sora',sans-serif}
+.amodal-err{background:var(--am-err-bg);border:1px solid var(--am-err-bd);color:var(--am-err-fg);padding:10px 13px;border-radius:10px;font:500 12.5px/1.4 'Sora',sans-serif;margin-bottom:14px}
 .amodal-form{display:flex;flex-direction:column;gap:12px}
 .amodal-ipt{position:relative;display:flex;align-items:center}
-.amodal-ipt>svg{position:absolute;left:13px;width:18px;height:18px;color:#9aa3b2;pointer-events:none}
-.amodal-ipt input{width:100%;padding:13px 14px 13px 42px;border-radius:10px;border:1px solid #d9dee6;background:#fff;color:#16202e;font:500 14.5px/1 'Sora',sans-serif;outline:none;transition:border-color .15s,box-shadow .15s}
-.amodal-ipt input::placeholder{color:#9aa3b2}
-.amodal-ipt input:focus{border-color:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.amodal-ipt>svg{position:absolute;left:13px;width:18px;height:18px;color:var(--am-muted);pointer-events:none}
+.amodal-ipt input{width:100%;padding:13px 14px 13px 42px;border-radius:10px;border:1px solid var(--am-input-border);background:var(--am-input);color:var(--am-fg);font:500 14.5px/1 'Sora',sans-serif;outline:none;transition:border-color .15s,box-shadow .15s}
+.amodal-ipt input::placeholder{color:var(--am-muted)}
+.amodal-ipt input:focus{border-color:#3B82F6;box-shadow:0 0 0 3px rgba(59,130,246,.18)}
 .amodal-ipt.has-eye input{padding-right:42px}
-.amodal-eye{position:absolute;right:8px;width:30px;height:30px;border:0;background:transparent;color:#9aa3b2;cursor:pointer;display:grid;place-items:center;border-radius:7px}
-.amodal-eye:hover{color:#3B82F6;background:#f0f6ff}
+.amodal-eye{position:absolute;right:8px;width:30px;height:30px;border:0;background:transparent;color:var(--am-muted);cursor:pointer;display:grid;place-items:center;border-radius:7px}
+.amodal-eye:hover{color:#3B82F6;background:var(--am-ghost-hover)}
 .amodal-submit{margin-top:6px;padding:13px;border:0;border-radius:10px;background:linear-gradient(135deg,#3B82F6,#06B6D4);color:#fff;font:700 15px/1 'Sora',sans-serif;cursor:pointer;transition:transform .12s,box-shadow .12s,opacity .12s;box-shadow:0 10px 24px rgba(59,130,246,.32)}
 .amodal-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 14px 30px rgba(59,130,246,.42)}
 .amodal-submit:disabled{opacity:.6;cursor:not-allowed}
-.amodal-or{display:flex;align-items:center;gap:12px;margin:18px 0;color:#9aa3b2;font:600 11px/1 'Sora',sans-serif;letter-spacing:1px}
-.amodal-or::before,.amodal-or::after{content:"";height:1px;flex:1;background:#e6e9ee}
-.amodal-google{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;border-radius:10px;border:1px solid #d9dee6;background:#fff;color:#16202e;font:600 14px/1 'Sora',sans-serif;cursor:pointer;transition:background .12s,box-shadow .12s,opacity .12s}
-.amodal-google:hover:not(:disabled){background:#f7f9fc;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.amodal-or{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--am-muted);font:600 11px/1 'Sora',sans-serif;letter-spacing:1px}
+.amodal-or::before,.amodal-or::after{content:"";height:1px;flex:1;background:var(--am-or)}
+.amodal-google,.amodal-guest{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;border-radius:10px;border:1px solid var(--am-input-border);background:var(--am-input);color:var(--am-fg);font:600 14px/1 'Sora',sans-serif;cursor:pointer;transition:background .12s,box-shadow .12s,border-color .12s,opacity .12s}
+.amodal-google:hover:not(:disabled),.amodal-guest:hover{background:var(--am-ghost-hover);border-color:#3B82F6}
 .amodal-google:disabled{opacity:.5;cursor:not-allowed}
-.amodal-note{margin:9px 2px 0;color:#9aa3b2;font:400 11.5px/1.45 'Sora',sans-serif;text-align:center}
-.amodal-switch{margin:20px 0 0;text-align:center;color:#697587;font:500 13.5px/1 'Sora',sans-serif}
+.amodal-guest{margin-top:10px;background:transparent}
+.amodal-guest svg{color:var(--am-sub)}
+.amodal-note{margin:9px 2px 0;color:var(--am-muted);font:400 11.5px/1.45 'Sora',sans-serif;text-align:center}
+.amodal-switch{margin:18px 0 0;text-align:center;color:var(--am-sub);font:500 13.5px/1 'Sora',sans-serif}
 .amodal-switch button{background:none;border:0;color:#3B82F6;font:700 13.5px/1 'Sora',sans-serif;cursor:pointer;padding:0 2px}
 .amodal-switch button:hover{text-decoration:underline}
+.amodal-cancel{width:100%;margin-top:14px;padding:11px;border:0;border-radius:10px;background:transparent;color:var(--am-muted);font:600 13px/1 'Sora',sans-serif;cursor:pointer;transition:color .12s,background .12s}
+.amodal-cancel:hover{color:var(--am-fg);background:var(--am-ghost-hover)}
 @keyframes amfade{from{opacity:0}to{opacity:1}}
 @keyframes amrise{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
 `;
@@ -531,8 +548,15 @@ const AM_EYE_OFF = (
   </svg>
 );
 
-export function AuthModal({ open, onClose }) {
-  const { login, register, loginWithGoogle } = useAuth();
+const AM_GUEST = (
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" />
+  </svg>
+);
+
+export function AuthModal({ open, onClose, theme }) {
+  const { login, register, loginWithGoogle, continueAsGuest } = useAuth();
+  const { toast } = useToast();
   const { t } = useT();
   const [mode, setMode] = useState("login");
   const [name, setName] = useState("");
@@ -599,7 +623,7 @@ export function AuthModal({ open, onClose }) {
   };
 
   return createPortal(
-    <div className="amodal-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className={`amodal-overlay${theme === "light" ? " am-light" : ""}`} onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <style>{AUTH_MODAL_CSS}</style>
       <div className="amodal" role="dialog" aria-modal="true" aria-label="Authentication" ref={modalRef} tabIndex={-1}>
         <button className="amodal-x" onClick={onClose} aria-label="Close">×</button>
@@ -648,8 +672,7 @@ export function AuthModal({ open, onClose }) {
         <button
           type="button"
           className="amodal-google"
-          onClick={loginWithGoogle}
-          disabled={!googleOn}
+          onClick={() => { if (googleOn) loginWithGoogle(); else toast(t("auth.googleNotConfigured"), "info"); }}
           title={googleOn ? t("auth.googleContinue") : t("auth.googleNotConfigured")}
         >
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -662,22 +685,63 @@ export function AuthModal({ open, onClose }) {
         </button>
         {!googleOn && <p className="amodal-note">{t("amodal.googleNote")}</p>}
 
+        <button type="button" className="amodal-guest" onClick={() => { continueAsGuest(); onClose(); }}>
+          {AM_GUEST}{t("auth.continueGuest")}
+        </button>
+        <p className="amodal-note">{t("amodal.guestNote")}</p>
+
         <p className="amodal-switch">
           {isReg ? t("auth.haveAccount") : t("amodal.signUpPrompt")}{" "}
           <button type="button" onClick={flip}>{isReg ? t("amodal.login") : t("amodal.signUp")}</button>
         </p>
+
+        <button type="button" className="amodal-cancel" onClick={onClose}>{t("auth.cancel")}</button>
       </div>
     </div>,
     document.body
   );
 }
 
+// Wraps a protected page. Signed-in users AND guests pass through; anyone who
+// has neither signed in nor chosen guest gets an in-page gate (not a redirect),
+// matching the History page's sign-in panel.
+export function AuthGate({ eyebrowKey, titleKey, children }) {
+  const { isAuthed } = useAuth();
+  const { t } = useT();
+  const nav = useNavigate();
+  if (isAuthed) return children;
+  return (
+    <main className="se-wrap page">
+      <div className="page-head">
+        <span className="eyebrow">{t(eyebrowKey)}</span>
+        <h1 className="page-h">{t(titleKey)}</h1>
+      </div>
+      <section className="card auth-gate">
+        <div className="auth-gate-ic">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="4" y="11" width="16" height="9" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" />
+          </svg>
+        </div>
+        <h3>{t("gate.title")}</h3>
+        <p className="muted">{t("gate.body")}</p>
+        <button className="btn btn-primary btn-lg" onClick={() => nav("/login")}>{t("gate.cta")}</button>
+      </section>
+    </main>
+  );
+}
+
 export function NavBar({ isMock, theme, onToggleTheme, a11y, onToggleA11y }) {
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthed } = useAuth();
   const { t, lang, setLang } = useT();
   const [authOpen, setAuthOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
+
+  // Prompt for sign-in / guest on first load when neither has been chosen.
+  useEffect(() => {
+    if (!isAuthed) setAuthOpen(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const modelPill =
     isMock == null
       ? { cls: "", txt: "…" }
@@ -722,7 +786,7 @@ export function NavBar({ isMock, theme, onToggleTheme, a11y, onToggleA11y }) {
             {(LANGS.find((l) => l.code !== lang) || LANGS[0]).label}
           </button>
           {!user && <button className="se-signin" onClick={() => setAuthOpen(true)}>{t("nav.signIn")}</button>}
-          <UserMenu onSignIn={() => setAuthOpen(true)} />
+          {user && <UserMenu onSignIn={() => setAuthOpen(true)} />}
         </div>
         <button
           className="nav-burger"
@@ -781,7 +845,7 @@ export function NavBar({ isMock, theme, onToggleTheme, a11y, onToggleA11y }) {
         </div>
       )}
 
-      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} />
+      <AuthModal open={authOpen} theme={theme} onClose={() => setAuthOpen(false)} />
     </nav>
   );
 }
