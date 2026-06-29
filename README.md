@@ -1,100 +1,93 @@
-# Smart Eye — Preliminary Vision-Screening Platform
+# Smart Eye — Backend & ML Pipeline Foundation
 
-Smart Eye is a multi-modal preliminary vision-screening and triage-support web application. It fuses three independent signals — a fundus-image disease classifier, real-time webcam fatigue/drowsiness monitoring, and a symptom questionnaire — into a single **Ocular Health Index (OHI, 0–100)** via a Mamdani fuzzy-inference engine, and returns rule-based triage recommendations with an explainable Grad-CAM visualisation.
+Foundation for the COM668 Smart Eye platform, locked to the **3-class fundus**
+scope (Normal / Glaucoma / Diabetic Retinopathy), single-backbone transfer
+learning, **MediaPipe** landmarks, and a **FastAPI + PostgreSQL** orchestration
+layer. Generated with AI assistance (Claude, Anthropic) as **engineering
+scaffolding**: published algorithms, integration plumbing, mocks, schema, and
+tests. The assessed core — the trained model and the fuzzy rule base — is left
+for you to write, marked at every boundary.
 
-> **Disclaimer:** Smart Eye is a *preliminary screening and triage-support utility*. It does **not** provide a clinical diagnosis. Final medical conclusions remain entirely the responsibility of qualified healthcare professionals.
+## AI assistance acknowledgment
 
----
+Keep a log (date · file · what was generated · what you changed and why) and
+cite it in your declaration. Treat every file here like a library or a
+supervisor's worked example: understand it line by line before your mentor
+review — you will be asked to explain it, and to defend the design choices.
 
-## Features
+## Scope decision (locked this sprint)
 
-| Capability | Description |
+- **Classes:** Normal / Glaucoma / Diabetic Retinopathy (fundus). Resolves the
+  earlier contradiction: these have clean labels in ODIR-5K / combined Kaggle
+  fundus sets, unlike the 9-class anterior list (no public dataset).
+- **Backbone:** single transfer-learning backbone (MobileNetV2 or ResNet-50),
+  not the 175M-param dual VGG+ResNet hybrid — correct complexity for 3 classes.
+- **Landmarks:** MediaPipe (settles the dlib contradiction in your docs).
+- Update your AT2/AT3 text so the report matches this. A marker comparing the
+  two will notice if they diverge.
+
+## Quickstart
+
+    python3.10 -m venv .venv && source .venv/bin/activate
+    pip install -r requirements.txt
+    pytest tests/ -v                    # foundation tests pass; sprint tests skip
+
+    # API (uses MockScreeningModel until you train the real one):
+    docker compose -f deploy/docker-compose.yml up --build
+    # -> http://localhost:8000/docs  (interactive API explorer)
+
+## Structure
+
+    smart_eye/
+      config.py                 Shared constants, OHI bands, mandated disclaimer
+      domain/
+        ear.py                  EAR formula + blink/closure state machine (MediaPipe)
+        fuzzy_engine.py         Mamdani MFs + demo rules (27-rule base is yours)
+        cnn_screening.py        Inference contract + mock (training is yours)
+      persistence/
+        models.py               SQLAlchemy models -> PostgreSQL (Screening Domain)
+      api/
+        schemas.py              Pydantic request/response contracts
+        main.py                 FastAPI endpoints wiring domain -> persistence
+    tests/test_smart_eye.py     T01–T05 as executable tests
+    deploy/                     Dockerfile + compose (API + Postgres)
+    models/                     Your exported fundus_classifier.keras goes here
+    notebooks/                  Your Colab training notebook goes here
+
+## What's provided vs. what's yours
+
+| Provided (foundation) | Yours (assessed) |
 |---|---|
-| **Fundus disease screening** | Hybrid dual-branch CNN (ResNet-50 + VGG-16) classifying four classes: Normal, Cataract, Glaucoma, Diabetic Retinopathy. |
-| **Grad-CAM explainability** | Heatmap overlay showing which retinal regions drove each prediction. |
-| **Real-time fatigue monitor** | In-browser webcam eye-aspect-ratio (EAR) tracking via MediaPipe Face Mesh (468 landmarks), with blink-rate analysis and drowsiness alerts. Only landmark coordinates leave the browser — the video never does. |
-| **Ocular Health Index** | A single 0–100 score fusing CNN confidence, fatigue, and symptom burden through a transparent Mamdani fuzzy engine. |
-| **Triage recommendations** | Rule-based next-step guidance derived from the OHI band. |
-| **Session history + PDF export** | Every screening is persisted locally; sessions are reviewable, trend-charted, CSV-exportable, and downloadable as a PDF report. |
-| **Mobile responsive** | Adaptive layout with a hamburger navigation menu on small screens. |
-| **Privacy-first** | Face detection runs on-device; no cloud image storage. |
+| EAR formula + blink/closure bookkeeping | Live capture loop, adaptive threshold, alert dispatch, real `fatigue_score` |
+| Fuzzy universes, MFs, defuzzification, 3 demo rules | The 27-rule matrix + tuning + expert validation (O3/M4) |
+| Inference contract + deterministic mock | ODIR-5K label wrangling, model architecture, training, eval (O1/M2) |
+| PostgreSQL schema, API endpoints, tests | WebAuthn/TOTP auth (US-001), PDF report endpoint (Sprint 5), Streamlit dashboard (Sprint 4) |
 
----
+## Two things to handle deliberately
 
-## Measured performance
+1. **ODIR-5K is multi-label** (one patient row, both eyes, multiple diagnosis
+   flags). Converting to clean single-label 3-class data — and deciding what to
+   do with comorbid/ambiguous cases — is your preprocessing task and a
+   defensible design decision you must be able to explain.
+2. **No auth ships here.** The API has no WebAuthn/TOTP yet (US-001 is its own
+   deliverable). Do not expose it publicly until you add it.
 
-| Metric | Result |
-|---|---|
-| CNN validation accuracy | **66%** (100-image validation sample, 25/class) |
-| Per-class F1 | Cataract 0.79 · Diabetic Retinopathy 0.70 · Normal 0.66 · Glaucoma 0.43 |
-| Image inference latency | **~79 ms** (budget 2000 ms) |
-| Fatigue-frame processing | **~0.03 ms** (budget 50 ms) |
-| Automated test suite | **22 tests passing** (core logic, model accuracy, performance, API/PDF) |
+## Sprint-to-code map
 
----
+| Sprint | You build | Where |
+|---|---|---|
+| 0 | ODIR-5K download + label wrangling, env | `notebooks/`, `models/` |
+| 1 | Single-backbone transfer learning, eval >=85%, export | replaces `MockScreeningModel` |
+| 2 | MediaPipe capture loop -> `BlinkDetector`; alert dispatch | client capture; extend `domain/ear.py` |
+| 3 | 27-rule Mamdani matrix + fatigue score + validation | `build_full_rule_base()`, `fatigue_score()` |
+| 4 | Streamlit dashboard (theme from Concept B) | new `ui/` |
+| 5 | Recommendations (<=2 actions) + PDF export | new module + API endpoint |
+| 6 | Integration tests T04–T08, latency benchmarks, hardening | `tests/` |
+| 7 | Evaluation, SUS study, AT3 | docs |
 
-## Tech stack
+## Honest limitations
 
-- **Backend:** Python 3.9, FastAPI, TensorFlow 2.13, NumPy, fpdf2
-- **Frontend:** React 18, Vite, MediaPipe Face Mesh
-- **ML:** Hybrid ResNet-50 + VGG-16 CNN; Mamdani fuzzy-inference engine; Grad-CAM
-- **Persistence:** SQLite
-- **Testing:** pytest, httpx
-
----
-
-## Setup
-
-### 1. Clone (with models)
-
-The trained models are stored via **Git LFS**. Install Git LFS first, then clone:
-
-```bash
-git lfs install
-git clone https://github.com/emon22-ts/smart-eye.git
-cd smart-eye
-git lfs pull
-```
-
-The working model is `smart_eye/models/hybrid_cnn_native.h5`.
-
-### 2. Backend
-
-```bash
-pip install -r requirements.txt
-python3 -m uvicorn smart_eye.orchestration.api:app --port 8000
-```
-
-### 3. Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Open `http://localhost:5173` in a Chromium-based browser (the fatigue monitor requires webcam access).
-
-### 4. Run the tests
-
-```bash
-python3 -m pytest smart_eye/tests/ -v
-```
-
----
-
-## Dataset
-
-The fundus dataset is **not included** in this repository. The four-class structure expected by `train_hybrid.py` is:Use `split_dataset.py` to produce the train/validation split from a source dataset.
-
----
-
-## Known limitations
-
-- **Glaucoma recall (0.32)** is the weakest class — glaucoma's optic-disc signs are subtle on fundus images, so the system should not be relied on to *rule out* glaucoma. This reinforces the preliminary-screening (not diagnostic) framing.
-- **Fatigue detection** is sensitive to camera elevation: a webcam mounted below eye level compresses the vertical EAR signal. Eye-level placement is recommended.
-- **Grad-CAM** visualises the ResNet-50 branch's attention; as a dual-branch fusion model, this is an approximate (single-branch) explanation.
-
----
-
-*Final-year project — Ulster University.*
+No trained model ships here (impossible to generate). The fuzzy demo rules are
+intentionally too coarse to submit. Auth, the live capture loop, the dashboard,
+and reporting do not exist yet. That is the project — this is the launchpad
+that lets you build it in a technically sound order.

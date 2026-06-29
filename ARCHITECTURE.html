@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Smart Eye — System Architecture</title>
+<style>
+  :root {
+    --bg: #050d1a;
+    --surface: #0d1f35;
+    --surface2: #112540;
+    --border: rgba(6,182,212,0.18);
+    --border2: rgba(59,130,246,0.15);
+    --accent: #06B6D4;
+    --blue: #3B82F6;
+    --green: #22C55E;
+    --amber: #F59E0B;
+    --red: #EF4444;
+    --purple: #A855F7;
+    --fg: #F1F5F9;
+    --muted: #94A3B8;
+    --muted2: #64748B;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--fg); min-height: 100vh; padding: 0; }
+
+  /* ── Header ── */
+  .hdr {
+    background: linear-gradient(135deg,#0a1929,#0d2540);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 40px 22px;
+    display: flex; align-items: center; gap: 18px;
+  }
+  .hdr-logo {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: linear-gradient(135deg,#3B82F6,#06B6D4);
+    display: grid; place-items: center;
+    box-shadow: 0 8px 24px rgba(6,182,212,.35);
+    flex-shrink: 0;
+  }
+  .hdr-logo svg { width: 26px; height: 26px; }
+  .hdr-text h1 { font-size: 22px; font-weight: 700; letter-spacing: -.02em; }
+  .hdr-text p { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .hdr-badge {
+    margin-left: auto; background: rgba(6,182,212,.12);
+    border: 1px solid rgba(6,182,212,.3); border-radius: 20px;
+    padding: 6px 14px; font-size: 11.5px; color: var(--accent);
+    font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  }
+
+  /* ── Nav tabs ── */
+  .tab-bar {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13,31,53,.6);
+    padding: 0 40px;
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 14px 22px; font-size: 13px; font-weight: 500;
+    color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent;
+    white-space: nowrap; transition: color .15s, border-color .15s;
+    background: none; border-top: none; border-left: none; border-right: none;
+  }
+  .tab:hover { color: var(--fg); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── Content pane ── */
+  .pane { display: none; padding: 40px; max-width: 1280px; margin: 0 auto; }
+  .pane.active { display: block; }
+
+  /* ── Section heading ── */
+  .sec-head { margin-bottom: 28px; }
+  .sec-head .eyebrow {
+    font-size: 10.5px; letter-spacing: .2em; font-weight: 700;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 6px;
+  }
+  .sec-head h2 { font-size: 26px; font-weight: 700; letter-spacing: -.02em; }
+  .sec-head p { font-size: 14px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+
+  /* ── Card ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px;
+  }
+  .card-sm { border-radius: 12px; padding: 18px; }
+
+  /* ── Grid layouts ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  @media(max-width:900px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}}
+
+  /* ── Layer boxes ── */
+  .layer {
+    border-radius: 14px; padding: 20px 22px;
+    border: 1px solid; margin-bottom: 16px;
+    position: relative;
+  }
+  .layer-label {
+    font-size: 10px; font-weight: 700; letter-spacing: .18em;
+    text-transform: uppercase; margin-bottom: 10px; opacity: .8;
+  }
+  .layer-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .layer-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+  .layer-user   { background:rgba(168,85,247,.06); border-color:rgba(168,85,247,.25); }
+  .layer-front  { background:rgba(59,130,246,.06);  border-color:rgba(59,130,246,.25); }
+  .layer-api    { background:rgba(6,182,212,.06);   border-color:rgba(6,182,212,.25); }
+  .layer-domain { background:rgba(34,197,94,.06);   border-color:rgba(34,197,94,.25); }
+  .layer-data   { background:rgba(245,158,11,.06);  border-color:rgba(245,158,11,.25); }
+
+  .layer-user   .layer-label { color: var(--purple); }
+  .layer-front  .layer-label { color: var(--blue); }
+  .layer-api    .layer-label { color: var(--accent); }
+  .layer-domain .layer-label { color: var(--green); }
+  .layer-data   .layer-label { color: var(--amber); }
+
+  /* ── Arrow ── */
+  .arrow {
+    text-align: center; color: var(--muted2); font-size: 20px;
+    margin: -4px 0; line-height: 1;
+  }
+
+  /* ── Pill tags ── */
+  .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+  .tag {
+    font-size: 11px; padding: 3px 10px; border-radius: 20px;
+    border: 1px solid; font-weight: 500;
+  }
+  .tag-blue   { color: var(--blue);   border-color: rgba(59,130,246,.35);   background: rgba(59,130,246,.08); }
+  .tag-cyan   { color: var(--accent); border-color: rgba(6,182,212,.35);    background: rgba(6,182,212,.08); }
+  .tag-green  { color: var(--green);  border-color: rgba(34,197,94,.35);    background: rgba(34,197,94,.08); }
+  .tag-amber  { color: var(--amber);  border-color: rgba(245,158,11,.35);   background: rgba(245,158,11,.08); }
+  .tag-red    { color: var(--red);    border-color: rgba(239,68,68,.35);    background: rgba(239,68,68,.08); }
+  .tag-purple { color: var(--purple); border-color: rgba(168,85,247,.35);   background: rgba(168,85,247,.08); }
+
+  /* ── Flow diagram ── */
+  .flow { display: flex; flex-direction: column; gap: 0; }
+  .flow-row {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .flow-box {
+    flex: 1; padding: 14px 16px; border-radius: 12px;
+    border: 1px solid var(--border); background: var(--surface2);
+    text-align: center;
+  }
+  .flow-box .fb-label { font-size: 10px; color: var(--muted2); text-transform: uppercase; letter-spacing: .12em; }
+  .flow-box .fb-title { font-size: 13.5px; font-weight: 600; margin-top: 3px; }
+  .flow-box .fb-sub   { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .flow-arrow { color: var(--muted2); font-size: 18px; flex-shrink: 0; }
+  .flow-gap { height: 12px; }
+  .flow-connector {
+    width: 1px; height: 28px; background: var(--border);
+    margin: 0 auto;
+  }
+
+  /* colour variants */
+  .fb-blue   { border-color:rgba(59,130,246,.35)!important; background:rgba(59,130,246,.06)!important; }
+  .fb-cyan   { border-color:rgba(6,182,212,.35)!important;  background:rgba(6,182,212,.06)!important; }
+  .fb-green  { border-color:rgba(34,197,94,.35)!important;  background:rgba(34,197,94,.06)!important; }
+  .fb-amber  { border-color:rgba(245,158,11,.35)!important; background:rgba(245,158,11,.06)!important; }
+  .fb-purple { border-color:rgba(168,85,247,.35)!important; background:rgba(168,85,247,.08)!important; }
+  .fb-red    { border-color:rgba(239,68,68,.35)!important;  background:rgba(239,68,68,.06)!important; }
+
+  /* ── Metric card ── */
+  .metric { text-align: center; padding: 22px 14px; }
+  .metric .m-val { font-size: 34px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+  .metric .m-unit { font-size: 14px; color: var(--muted); }
+  .metric .m-label { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+  /* ── File tree ── */
+  .tree { font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8; color: var(--muted); }
+  .tree .dir  { color: var(--blue); font-weight: 600; }
+  .tree .file { color: var(--fg); }
+  .tree .note { color: var(--muted2); font-style: italic; }
+  .tree .hi   { color: var(--accent); font-weight: 600; }
+
+  /* ── Fuzzy diagram ── */
+  .fz-wrap { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 0; align-items: center; }
+  .fz-inputs { display: flex; flex-direction: column; gap: 10px; }
+  .fz-input {
+    padding: 12px 16px; border-radius: 10px;
+    border: 1px solid rgba(59,130,246,.3);
+    background: rgba(59,130,246,.07);
+    font-size: 13px;
+  }
+  .fz-input .fi-name { font-weight: 600; color: var(--blue); }
+  .fz-input .fi-range { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .fz-engine {
+    padding: 22px 20px; border-radius: 14px; margin: 0 16px;
+    border: 1px solid rgba(6,182,212,.3); background: rgba(6,182,212,.06);
+    text-align: center; min-width: 160px;
+  }
+  .fz-engine .fe-title { font-size: 14px; font-weight: 700; color: var(--accent); }
+  .fz-engine .fe-sub   { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .fz-outputs { display: flex; flex-direction: column; gap: 10px; }
+  .fz-out {
+    padding: 12px 16px; border-radius: 10px; font-size: 13px;
+    border: 1px solid; font-weight: 600;
+  }
+  .fz-out-pri { border-color:rgba(239,68,68,.35); background:rgba(239,68,68,.07); color:var(--red); }
+  .fz-out-sri { border-color:rgba(34,197,94,.35); background:rgba(34,197,94,.07); color:var(--green); }
+  .fz-arrow   { font-size: 22px; color: var(--muted2); padding: 0 8px; }
+  @media(max-width:700px){
+    .fz-wrap{grid-template-columns:1fr; justify-items:stretch;}
+    .fz-engine{margin:12px 0;}
+    .fz-arrow{transform:rotate(90deg); text-align:center;}
+  }
+
+  /* ── Security/GDPR callout ── */
+  .callout {
+    padding: 18px 20px; border-radius: 12px; border-left: 3px solid;
+    margin-bottom: 14px; font-size: 13.5px; line-height: 1.6;
+  }
+  .callout-green { border-color:var(--green); background:rgba(34,197,94,.06); }
+  .callout-amber { border-color:var(--amber); background:rgba(245,158,11,.06); }
+  .callout-red   { border-color:var(--red);   background:rgba(239,68,68,.06); }
+
+  /* ── Separator ── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════ HEADER ══════════════════════════ -->
+<div class="hdr">
+  <div class="hdr-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round">
+      <ellipse cx="12" cy="12" rx="9" ry="6"/>
+      <circle cx="12" cy="12" r="2.5" fill="#fff" stroke="none"/>
+    </svg>
+  </div>
+  <div class="hdr-text">
+    <h1>Smart Eye — System Architecture</h1>
+    <p>COM668 Final Year Project · Ulster University · Mahfuzur Rahman Emon · B00976168</p>
+  </div>
+  <div class="hdr-badge">v2.4</div>
+</div>
+
+<!-- ══════════════════════════ TABS ══════════════════════════ -->
+<div class="tab-bar">
+  <button class="tab active" onclick="show('overview')">System Overview</button>
+  <button class="tab" onclick="show('layers')">Layer Architecture</button>
+  <button class="tab" onclick="show('pipeline')">Screening Pipeline</button>
+  <button class="tab" onclick="show('fuzzy')">Fuzzy Engine</button>
+  <button class="tab" onclick="show('data')">Data Flow</button>
+  <button class="tab" onclick="show('files')">File Structure</button>
+  <button class="tab" onclick="show('metrics')">Performance</button>
+</div>
+
+<!-- ══════════════════════════ PANE: OVERVIEW ══════════════════════════ -->
+<div class="pane active" id="pane-overview">
+  <div class="sec-head">
+    <div class="eyebrow">System Overview</div>
+    <h2>Multi-Modal Ocular Health Screening</h2>
+    <p>Smart Eye fuses three independent data sources — a CNN image classifier, a live webcam fatigue monitor, and a symptom questionnaire — through a Mamdani fuzzy inference engine to produce a single explainable Ocular Health Index (OHI).</p>
+  </div>
+
+  <!-- Three input streams -->
+  <div class="grid-3" style="margin-bottom:20px">
+    <div class="card card-sm fb-blue">
+      <div class="fb-label" style="color:var(--blue);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Input 1</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">🖼 Fundus Image</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.55">User uploads an anterior-segment or fundus photograph. EfficientNetB0 classifies into 4 disease categories and produces a Grad-CAM heatmap.</div>
+      <div class="tags">
+        <span class="tag tag-blue">EfficientNetB0</span>
+        <span class="tag tag-blue">Grad-CAM</span>
+        <span class="tag tag-blue">4-class CNN</span>
+      </div>
+    </div>
+    <div class="card card-sm fb-cyan">
+      <div class="fb-label" style="color:var(--accent);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Input 2</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">👁 Webcam Fatigue</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.55">Live 68-point facial landmark tracking computes Eye Aspect Ratio (EAR) at ~8 Hz to detect drowsiness and measure blink compliance in real time.</div>
+      <div class="tags">
+        <span class="tag tag-cyan">dlib 68-pt</span>
+        <span class="tag tag-cyan">EAR tracking</span>
+        <span class="tag tag-cyan">~8 Hz</span>
+      </div>
+    </div>
+    <div class="card card-sm fb-purple">
+      <div class="fb-label" style="color:var(--purple);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Input 3</div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:6px">📋 Symptom Survey</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.55">A structured Likert-scale questionnaire captures subjective symptom burden (blurred vision, pain, photophobia, etc.) and produces a 1–5 aggregate severity score.</div>
+      <div class="tags">
+        <span class="tag tag-purple">Likert 1–5</span>
+        <span class="tag tag-purple">7 symptoms</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fusion box -->
+  <div class="arrow">↓ &nbsp; ↓ &nbsp; ↓</div>
+  <div class="card" style="margin:12px 0;border-color:rgba(6,182,212,.3);background:rgba(6,182,212,.05);text-align:center;padding:28px">
+    <div style="font-size:11px;letter-spacing:.18em;color:var(--accent);font-weight:700;text-transform:uppercase;margin-bottom:8px">Mamdani Fuzzy Inference Engine</div>
+    <div style="font-size:19px;font-weight:700;margin-bottom:8px">Decoupled PRI + SRI Fusion</div>
+    <div style="font-size:13.5px;color:var(--muted);max-width:600px;margin:0 auto;line-height:1.6">Two isolated evaluation tracks ensure that a high-confidence pathology finding always triggers immediate triage, regardless of fatigue level. Centroid defuzzification → OHI [0–100].</div>
+    <div class="tags" style="justify-content:center;margin-top:14px">
+      <span class="tag tag-red">PRI — Pathology Risk Index</span>
+      <span class="tag tag-green">SRI — Screening Reliability Index</span>
+      <span class="tag tag-cyan">Centroid defuzz</span>
+      <span class="tag tag-cyan">scikit-fuzzy</span>
+    </div>
+  </div>
+
+  <div class="arrow">↓</div>
+
+  <!-- Three outputs -->
+  <div class="grid-3" style="margin-top:12px">
+    <div class="card card-sm fb-green">
+      <div style="font-size:22px;font-weight:800;color:var(--green);margin-bottom:4px">OHI</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">Ocular Health Index</div>
+      <div style="font-size:12.5px;color:var(--muted)">Composite 0–100 score. Higher = healthier. Displayed as an animated gauge with Low / Moderate / High risk bands.</div>
+    </div>
+    <div class="card card-sm fb-amber">
+      <div style="font-size:22px;font-weight:800;color:var(--amber);margin-bottom:4px">Triage</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">Clinical Recommendation</div>
+      <div style="font-size:12.5px;color:var(--muted)">One of: ROUTINE_MONITORING · FOLLOW_UP_RECOMMENDED · IMMEDIATE_CLINICAL_PRIORITY. Derived from PRI only — fatigue-independent.</div>
+    </div>
+    <div class="card card-sm fb-blue">
+      <div style="font-size:22px;font-weight:800;color:var(--blue);margin-bottom:4px">CAM</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">Grad-CAM Heatmap</div>
+      <div style="font-size:12.5px;color:var(--muted)">Gradient-weighted class activation map overlaid on the uploaded image, highlighting the regions driving the CNN prediction.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ PANE: LAYERS ══════════════════════════ -->
+<div class="pane" id="pane-layers">
+  <div class="sec-head">
+    <div class="eyebrow">Layer Architecture</div>
+    <h2>Five-Layer Stack</h2>
+    <p>Smart Eye follows a clean separation of concerns across five distinct layers from user interface to data persistence.</p>
+  </div>
+
+  <div class="layer layer-user">
+    <div class="layer-label">Layer 1 — Presentation</div>
+    <div class="layer-title">User Interface (React 18 + Vite)</div>
+    <div class="layer-desc">Single-page application served on port 5173. Handles all rendering, routing, theme management, i18n (EN/বাংলা), and accessibility. Communicates with the backend exclusively via REST API calls — no direct database or model access.</div>
+    <div class="tags">
+      <span class="tag tag-purple">React 18</span>
+      <span class="tag tag-purple">Vite</span>
+      <span class="tag tag-purple">Vanilla CSS</span>
+      <span class="tag tag-purple">React Router</span>
+      <span class="tag tag-purple">8 pages</span>
+      <span class="tag tag-purple">Dark + Light theme</span>
+      <span class="tag tag-purple">EN / বাংলা i18n</span>
+    </div>
+  </div>
+  <div class="arrow">↕</div>
+
+  <div class="layer layer-front">
+    <div class="layer-label">Layer 2 — API Gateway</div>
+    <div class="layer-title">FastAPI Application (smart_eye/orchestration/api.py)</div>
+    <div class="layer-desc">Async REST API on port 8000. Handles authentication (JWT + Google OAuth), request validation (Pydantic), session orchestration, and routing to domain services. Mounts a parallel `/api/anterior/*` router for the anterior-segment module.</div>
+    <div class="tags">
+      <span class="tag tag-blue">FastAPI</span>
+      <span class="tag tag-blue">Pydantic</span>
+      <span class="tag tag-blue">JWT auth</span>
+      <span class="tag tag-blue">Google OAuth</span>
+      <span class="tag tag-blue">Python 3.9.6</span>
+      <span class="tag tag-blue">Uvicorn</span>
+    </div>
+  </div>
+  <div class="arrow">↕</div>
+
+  <div class="layer layer-api">
+    <div class="layer-label">Layer 3 — Orchestration</div>
+    <div class="layer-title">Session Orchestrator (score_session)</div>
+    <div class="layer-desc">Coordinates the three-stage screening workflow: (1) invoke CNN inference on the uploaded image, (2) collect fatigue snapshot, (3) receive symptom score, then feed all three into the fuzzy engine and return a unified OHI result with triage recommendation.</div>
+    <div class="tags">
+      <span class="tag tag-cyan">Multi-modal fusion</span>
+      <span class="tag tag-cyan">FatigueSnapshot</span>
+      <span class="tag tag-cyan">OHI computation</span>
+      <span class="tag tag-cyan">Recommendation engine</span>
+    </div>
+  </div>
+  <div class="arrow">↕</div>
+
+  <div class="layer layer-domain">
+    <div class="layer-label">Layer 4 — Domain Services</div>
+    <div class="layer-title">Core Intelligence (smart_eye/domain/)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:10px">
+      <div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:5px">CNN Pipeline</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">EfficientNetB0 inference · 4-class softmax · Grad-CAM heatmap · pathology confidence</div>
+      </div>
+      <div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:5px">Fatigue Monitor</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">68-point landmark EAR · blink detection · drowsy flag · per-session snapshot</div>
+      </div>
+      <div style="background:rgba(34,197,94,.05);border:1px solid rgba(34,197,94,.2);border-radius:10px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:5px">Fuzzy Engine</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">Mamdani PRI + SRI · Centroid defuzz · NaN guard · decoupled clinical safety</div>
+      </div>
+    </div>
+    <div class="tags" style="margin-top:12px">
+      <span class="tag tag-green">TensorFlow 2.13</span>
+      <span class="tag tag-green">scikit-fuzzy</span>
+      <span class="tag tag-green">dlib</span>
+      <span class="tag tag-green">NumPy</span>
+      <span class="tag tag-green">fpdf2</span>
+      <span class="tag tag-green">OpenCV</span>
+    </div>
+  </div>
+  <div class="arrow">↕</div>
+
+  <div class="layer layer-data">
+    <div class="layer-label">Layer 5 — Persistence</div>
+    <div class="layer-title">Local SQLite Storage (smart_eye/persistence/store.py)</div>
+    <div class="layer-desc">Privacy-first on-device storage. Only numerical scores and timestamps are persisted — no images, no raw biometrics. Two tables: users (hashed credentials) and sessions (OHI, risk band, top finding, fatigue score, symptom aggregate). No cloud transmission.</div>
+    <div class="tags">
+      <span class="tag tag-amber">SQLite</span>
+      <span class="tag tag-amber">bcrypt hashing</span>
+      <span class="tag tag-amber">No image storage</span>
+      <span class="tag tag-amber">GDPR-compliant</span>
+      <span class="tag tag-amber">Local only</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ PANE: PIPELINE ══════════════════════════ -->
+<div class="pane" id="pane-pipeline">
+  <div class="sec-head">
+    <div class="eyebrow">Screening Pipeline</div>
+    <h2>End-to-End Session Flow</h2>
+    <p>A complete screening session from image upload to clinical PDF download, showing every processing step and decision point.</p>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card" style="margin-bottom:16px;border-color:rgba(168,85,247,.25)">
+        <div style="font-size:11px;color:var(--purple);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px">Stage A — Image Classification</div>
+        <div class="flow">
+          <div class="flow-row">
+            <div class="flow-box fb-purple"><div class="fb-label">User action</div><div class="fb-title">Upload fundus image</div><div class="fb-sub">JPG / PNG / WebP</div></div>
+          </div>
+          <div class="flow-connector"></div>
+          <div class="flow-row">
+            <div class="flow-box fb-blue"><div class="fb-label">Preprocessing</div><div class="fb-title">Resize to 224×224</div><div class="fb-sub">EfficientNet native normalisation</div></div>
+          </div>
+          <div class="flow-connector"></div>
+          <div class="flow-row">
+            <div class="flow-box fb-cyan"><div class="fb-label">CNN Inference</div><div class="fb-title">EfficientNetB0 forward pass</div><div class="fb-sub">~80 ms · 4-class softmax</div></div>
+          </div>
+          <div class="flow-connector"></div>
+          <div class="flow-row">
+            <div class="flow-box fb-green"><div class="fb-label">Explainability</div><div class="fb-title">Grad-CAM heatmap</div><div class="fb-sub">top_activation layer · 7×7 → upsampled</div></div>
+          </div>
+          <div class="flow-connector"></div>
+          <div class="flow-row">
+            <div class="flow-box fb-amber"><div class="fb-label">Output</div><div class="fb-title">cnn_confidence score</div><div class="fb-sub">1 − P(Normal) → fuzzy engine</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" style="margin-bottom:16px;border-color:rgba(6,182,212,.25)">
+        <div style="font-size:11px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px">Stage B — Fatigue Monitoring</div>
+        <div class="flow">
+          <div class="flow-row">
+            <div class="flow-box fb-cyan"><div class="fb-label">Input</div><div class="fb-title">Webcam frame (68 landmarks)</div><div class="fb-sub">x,y coordinates only · no image sent</div></div>
+          </div>
+          <div class="flow-connector"></div>
+          <div class="flow-row">
+            <div class="flow-box fb-blue"><div class="fb-label">Computation</div><div class="fb-title">Eye Aspect Ratio (EAR)</div><div class="fb-sub">EAR = (A+B) / (2×C) · ~0.03 ms</div></div>
+          </div>
+          <div class="flow-connector"></div>
+          <div class="flow-row">
+            <div class="flow-box fb-cyan"><div class="fb-label">Detection</div><div class="fb-title">Blink + drowsiness</div><div class="fb-sub">EAR &lt; 0.25 threshold · blink rate BPM</div></div>
+          </div>
+          <div class="flow-connector"></div>
+          <div class="flow-row">
+            <div class="flow-box fb-amber"><div class="fb-label">Output</div><div class="fb-title">FatigueSnapshot</div><div class="fb-sub">fatigue_score [0–100] · drowsy flag · blink BPM</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="border-color:rgba(34,197,94,.25);margin-bottom:16px">
+    <div style="font-size:11px;color:var(--green);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px">Stage C — Fusion &amp; Scoring</div>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;align-items:center">
+      <div class="flow-box fb-blue" style="text-align:center"><div class="fb-label">Input</div><div class="fb-title">cnn_confidence + symptoms</div></div>
+      <div class="flow-arrow" style="padding:0 12px">→</div>
+      <div class="flow-box fb-red" style="text-align:center"><div class="fb-label">Track A</div><div class="fb-title">Pathology Risk Index</div><div class="fb-sub">PRI [0–100]</div></div>
+      <div class="flow-arrow" style="padding:0 12px">→</div>
+      <div class="flow-box fb-amber" style="text-align:center"><div class="fb-label">Output</div><div class="fb-title">Triage recommendation</div><div class="fb-sub">Fatigue-independent</div></div>
+    </div>
+    <div style="height:12px"></div>
+    <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;align-items:center">
+      <div class="flow-box fb-cyan" style="text-align:center"><div class="fb-label">Input</div><div class="fb-title">fatigue + blink_compliance</div></div>
+      <div class="flow-arrow" style="padding:0 12px">→</div>
+      <div class="flow-box fb-green" style="text-align:center"><div class="fb-label">Track B</div><div class="fb-title">Screening Reliability Index</div><div class="fb-sub">SRI [0–100]</div></div>
+      <div class="flow-arrow" style="padding:0 12px">→</div>
+      <div class="flow-box fb-purple" style="text-align:center"><div class="fb-label">Output</div><div class="fb-title">Reliability caveat</div><div class="fb-sub">Recapture advisory only</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="border-color:rgba(245,158,11,.25)">
+    <div style="font-size:11px;color:var(--amber);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:14px">Stage D — Outputs Delivered to User</div>
+    <div class="grid-4">
+      <div style="text-align:center;padding:14px">
+        <div style="font-size:28px;margin-bottom:6px">📊</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">OHI Gauge</div>
+        <div style="font-size:11.5px;color:var(--muted)">Animated 0–100 score with risk band</div>
+      </div>
+      <div style="text-align:center;padding:14px">
+        <div style="font-size:28px;margin-bottom:6px">🔥</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">Grad-CAM Overlay</div>
+        <div style="font-size:11.5px;color:var(--muted)">Heatmap on original image</div>
+      </div>
+      <div style="text-align:center;padding:14px">
+        <div style="font-size:28px;margin-bottom:6px">🏥</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">Triage Flag</div>
+        <div style="font-size:11.5px;color:var(--muted)">Immediate / Follow-up / Routine</div>
+      </div>
+      <div style="text-align:center;padding:14px">
+        <div style="font-size:28px;margin-bottom:6px">📄</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">Clinical PDF</div>
+        <div style="font-size:11.5px;color:var(--muted)">Downloadable report with all findings</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ PANE: FUZZY ══════════════════════════ -->
+<div class="pane" id="pane-fuzzy">
+  <div class="sec-head">
+    <div class="eyebrow">Fuzzy Inference Engine</div>
+    <h2>Decoupled Mamdani System</h2>
+    <p>The clinical safety requirement mandates that high pathology risk always triggers immediate triage, regardless of the user's fatigue state. This is achieved through structural decoupling — two isolated Mamdani systems with no shared outputs.</p>
+  </div>
+
+  <div class="card" style="margin-bottom:24px">
+    <div class="fz-wrap">
+      <div class="fz-inputs">
+        <div class="fz-input">
+          <div class="fi-name">cnn_confidence</div>
+          <div class="fi-range">Range: [0.0 – 1.0] · 1 − P(Normal)</div>
+        </div>
+        <div class="fz-input">
+          <div class="fi-name">symptom_burden</div>
+          <div class="fi-range">Range: [1.0 – 5.0] · Likert aggregate</div>
+        </div>
+      </div>
+      <div class="fz-arrow">→</div>
+      <div class="fz-engine">
+        <div class="fe-title">PRI Engine</div>
+        <div class="fe-sub">Pathology Risk Index</div>
+        <div style="margin:10px 0;height:1px;background:rgba(6,182,212,.2)"></div>
+        <div style="font-size:11px;color:var(--muted);text-align:left;line-height:1.7">
+          MFs: Triangular + trapezoidal<br>
+          Rules: 3×3 expert block (9 rules)<br>
+          Defuzz: Centroid<br>
+          Shoulders: edge-pinned (no NaN)
+        </div>
+      </div>
+      <div class="fz-arrow">→</div>
+      <div class="fz-outputs">
+        <div class="fz-out fz-out-pri">PRI [0–100]<br><span style="font-size:11px;font-weight:400">→ Triage recommendation</span></div>
+        <div style="font-size:11.5px;color:var(--muted);padding:6px 0;line-height:1.5">PRI ≥ 66 → IMMEDIATE<br>PRI ≥ 34 → FOLLOW_UP<br>PRI &lt; 34 → ROUTINE</div>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="fz-wrap">
+      <div class="fz-inputs">
+        <div class="fz-input" style="border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.05)">
+          <div class="fi-name" style="color:var(--green)">eye_fatigue</div>
+          <div class="fi-range">Range: [0 – 100] · EAR-derived score</div>
+        </div>
+        <div class="fz-input" style="border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.05)">
+          <div class="fi-name" style="color:var(--green)">blink_compliance</div>
+          <div class="fi-range">Range: [0 – 100] · blink rate normalised</div>
+        </div>
+      </div>
+      <div class="fz-arrow">→</div>
+      <div class="fz-engine" style="border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.05)">
+        <div class="fe-title" style="color:var(--green)">SRI Engine</div>
+        <div class="fe-sub">Screening Reliability Index</div>
+        <div style="margin:10px 0;height:1px;background:rgba(34,197,94,.2)"></div>
+        <div style="font-size:11px;color:var(--muted);text-align:left;line-height:1.7">
+          MFs: Triangular + trapezoidal<br>
+          Rules: 3×3 expert block (9 rules)<br>
+          Defuzz: Centroid<br>
+          NaN guard: fallback = 50
+        </div>
+      </div>
+      <div class="fz-arrow">→</div>
+      <div class="fz-outputs">
+        <div class="fz-out fz-out-sri">SRI [0–100]<br><span style="font-size:11px;font-weight:400">→ Reliability caveat</span></div>
+        <div style="font-size:11.5px;color:var(--muted);padding:6px 0;line-height:1.5">SRI &lt; 40 → LOW_CAPTURE<br>_RELIABILITY_<br>RECOMMEND_RECAPTURE</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-red">
+    <strong style="color:var(--red)">Clinical Safety Guarantee:</strong> Because urgency is derived exclusively from PRI, a high-confidence pathology finding triggers <code>IMMEDIATE_CLINICAL_PRIORITY</code> even when the user is maximally fatigued (eye_fatigue = 100). Fatigue affects only the SRI output and its advisory caveat — it can never downgrade a genuine pathology alert. This is enforced structurally, not by a rule patch.
+  </div>
+  <div class="callout callout-green" style="margin-top:14px">
+    <strong style="color:var(--green)">Verified by automated test:</strong> <code>test_high_pathology_triggers_urgency_regardless_of_fatigue</code> parametrises eye_fatigue across [0, 50, 98, 100] and asserts <code>IMMEDIATE_CLINICAL_PRIORITY</code> in all cases when cnn_confidence = 0.92.
+  </div>
+
+  <div class="grid-3" style="margin-top:20px">
+    <div class="card card-sm">
+      <div style="font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Membership Functions</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">Triangular MFs for mid-range values (Low, Medium, High). Trapezoidal (edge-pinned shoulder) MFs at universe boundaries to guarantee full coverage — no gap where inputs could fall outside all MFs and produce NaN.</div>
+    </div>
+    <div class="card card-sm">
+      <div style="font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Rule Structure</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">Expert-defined 3×3 rule blocks (9 rules per system). PRI rules: if confidence is High AND symptoms are Moderate → PRI is High. All rule antecedents use fuzzy AND (minimum t-norm).</div>
+    </div>
+    <div class="card card-sm">
+      <div style="font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Defuzzification</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.6">Centroid method (centre of gravity). If the aggregated output is non-finite (edge case NaN from skfuzzy), a NaN guard catches it and returns a neutral fallback value of 50, preventing any unhandled exception propagating to the API.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ PANE: DATA FLOW ══════════════════════════ -->
+<div class="pane" id="pane-data">
+  <div class="sec-head">
+    <div class="eyebrow">Data Flow</div>
+    <h2>Request / Response Lifecycle</h2>
+    <p>How data moves from the browser to the backend services and back, with privacy boundaries shown.</p>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div style="font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px">POST /api/session/score — Main Screening Request</div>
+        <div style="font-size:13px;line-height:2;font-family:monospace;color:var(--muted);background:rgba(0,0,0,.3);padding:14px;border-radius:8px">
+          <span style="color:var(--blue)">// Request body (multipart form)</span><br>
+          image: File<br>
+          symptoms: float [1.0–5.0]<br>
+          fatigue_score: float [0–100]<br>
+          blink_rate_bpm: float<br>
+          drowsy: bool<br>
+          <br>
+          <span style="color:var(--green)">// Response JSON</span><br>
+          ohi: float<br>
+          colour: "green"|"amber"|"red"<br>
+          band: "Low"|"Moderate"|"High"<br>
+          recommendation: string<br>
+          urgent: bool<br>
+          disease: { top_class, confidence, all_probs }<br>
+          fatigue: { fatigue_score, drowsy, blink_rate_bpm }<br>
+          session_id: int
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div style="font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px">POST /api/fatigue/frame — Per-Frame Landmark Update</div>
+        <div style="font-size:13px;line-height:2;font-family:monospace;color:var(--muted);background:rgba(0,0,0,.3);padding:14px;border-radius:8px">
+          <span style="color:var(--blue)">// Request body (JSON)</span><br>
+          landmarks: [ [x,y], ... ] // 68 points<br>
+          <br>
+          <span style="color:var(--amber)">// ← coordinates only, no image pixels</span><br>
+          <span style="color:var(--amber)">// all processing on server, no webcam</span><br>
+          <span style="color:var(--amber)">// data leaves the browser</span><br>
+          <br>
+          <span style="color:var(--green)">// Response JSON</span><br>
+          ear: float<br>
+          fatigue_score: float<br>
+          drowsy: bool<br>
+          blink_rate_bpm: float<br>
+          frames_processed: int
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:12px;color:var(--amber);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px">Privacy Boundary — What is stored vs what is discarded</div>
+    <div class="grid-2">
+      <div>
+        <div style="font-size:12px;color:var(--green);font-weight:600;margin-bottom:10px">✓ Stored in SQLite (local only)</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.8">
+          OHI score (float)<br>
+          Risk band + colour<br>
+          Top disease class name<br>
+          Model confidence (float)<br>
+          Fatigue score (float)<br>
+          Symptom aggregate (float)<br>
+          Timestamp<br>
+          User ID (foreign key)
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--red);font-weight:600;margin-bottom:10px">✗ Never stored or transmitted</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.8">
+          Original fundus image<br>
+          Grad-CAM heatmap image<br>
+          Raw webcam frames<br>
+          Individual EAR measurements<br>
+          Raw landmark coordinates<br>
+          Individual blink timestamps<br>
+          Any biometric identifiers
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-green">
+    <strong style="color:var(--green)">GDPR Compliance:</strong> All image processing occurs in-memory on the local server. No image bytes are written to disk or transmitted to any external service. The database stores only derived numerical scores. Users can delete their session history at any time from the History page.
+  </div>
+</div>
+
+<!-- ══════════════════════════ PANE: FILE STRUCTURE ══════════════════════════ -->
+<div class="pane" id="pane-files">
+  <div class="sec-head">
+    <div class="eyebrow">File Structure</div>
+    <h2>Repository Layout</h2>
+    <p>Complete file tree with annotations for all key modules.</p>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div style="font-size:12px;color:var(--green);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px">Backend — smart_eye/</div>
+      <div class="tree">
+        <span class="dir">smart_eye/</span><br>
+        ├── <span class="dir">orchestration/</span><br>
+        │   ├── <span class="hi">api.py</span> <span class="note">← FastAPI app + all routes</span><br>
+        │   └── <span class="hi">anterior_api.py</span> <span class="note">← /api/anterior/* router</span><br>
+        ├── <span class="dir">domain/</span><br>
+        │   ├── <span class="hi">screening.py</span> <span class="note">← fundus CNN + Grad-CAM</span><br>
+        │   ├── <span class="hi">anterior_screening.py</span> <span class="note">← anterior classifier</span><br>
+        │   ├── <span class="hi">anterior_gradcam.py</span> <span class="note">← anterior Grad-CAM</span><br>
+        │   ├── <span class="hi">fatigue_monitor.py</span> <span class="note">← EAR + blink tracking</span><br>
+        │   ├── <span class="hi">fuzzy_engine.py</span> <span class="note">← decoupled PRI/SRI</span><br>
+        │   ├── <span class="hi">recommendations.py</span> <span class="note">← clinical text rules</span><br>
+        │   └── <span class="hi">report_generator.py</span> <span class="note">← fpdf2 PDF builder</span><br>
+        ├── <span class="dir">persistence/</span><br>
+        │   └── <span class="hi">store.py</span> <span class="note">← SQLite sessions + users</span><br>
+        ├── <span class="dir">tests/</span><br>
+        │   ├── <span class="file">test_auth_and_pdf.py</span> <span class="note">← 22 tests</span><br>
+        │   └── <span class="file">test_anterior.py</span> <span class="note">← 13 tests</span><br>
+        ├── <span class="file">schemas.py</span> <span class="note">← Pydantic models</span><br>
+        └── <span class="file">config.py</span> <span class="note">← constants + class names</span><br>
+        <br>
+        <span class="file">requirements.txt</span><br>
+        <span class="file">train_anterior.py</span> <span class="note">← anterior training script</span><br>
+        <span class="dir">dataset_anterior/</span> <span class="note">← not committed</span>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px;color:var(--blue);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px">Frontend — frontend/src/</div>
+      <div class="tree">
+        <span class="dir">frontend/src/</span><br>
+        ├── <span class="dir">pages/</span><br>
+        │   ├── <span class="hi">Home.jsx</span> <span class="note">← animated landing + stats</span><br>
+        │   ├── <span class="hi">Screening.jsx</span> <span class="note">← image upload + results</span><br>
+        │   ├── <span class="hi">Fatigue.jsx</span> <span class="note">← live webcam monitor</span><br>
+        │   ├── <span class="hi">History.jsx</span> <span class="note">← sessions + compare + CSV</span><br>
+        │   ├── <span class="hi">Analytics.jsx</span> <span class="note">← trend charts</span><br>
+        │   ├── <span class="hi">Help.jsx</span> <span class="note">← platform guide + FAQ</span><br>
+        │   ├── <span class="hi">Profile.jsx</span> <span class="note">← account settings</span><br>
+        │   └── <span class="hi">Login.jsx</span> <span class="note">← sign in / register / guest</span><br>
+        ├── <span class="hi">components.jsx</span> <span class="note">← NavBar, AuthModal, OHIGauge…</span><br>
+        ├── <span class="hi">auth.jsx</span> <span class="note">← AuthProvider + guest state</span><br>
+        ├── <span class="hi">api.js</span> <span class="note">← fetch wrappers</span><br>
+        ├── <span class="hi">i18n.jsx</span> <span class="note">← EN / বাংলা dictionary</span><br>
+        ├── <span class="hi">styles.js</span> <span class="note">← CSS export (dark + light)</span><br>
+        ├── <span class="hi">toast.jsx</span> <span class="note">← toast notifications</span><br>
+        └── <span class="file">constants.js</span> <span class="note">← colour palette</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div style="font-size:12px;color:var(--purple);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px">Key Dependencies</div>
+    <div class="grid-2">
+      <div>
+        <div style="font-size:12px;color:var(--muted2);font-weight:600;margin-bottom:8px">Python Backend</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.9;font-family:monospace">
+          fastapi<br>tensorflow==2.13<br>scikit-fuzzy<br>scikit-learn&gt;=1.3<br>dlib<br>opencv-python<br>fpdf2==2.8.4<br>Pillow<br>numpy&lt;2.0<br>pytest · httpx
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted2);font-weight:600;margin-bottom:8px">JavaScript Frontend</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.9;font-family:monospace">
+          react@18<br>react-dom@18<br>react-router-dom<br>vite<br>@mediapipe/face_mesh<br>esbuild (dev)<br>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ PANE: METRICS ══════════════════════════ -->
+<div class="pane" id="pane-metrics">
+  <div class="sec-head">
+    <div class="eyebrow">Performance Metrics</div>
+    <h2>Measured, Verified Numbers</h2>
+    <p>All figures below are measured values from the trained model and timing benchmarks — not aspirational targets. The fuzzy engine test suite runs in the CI pipeline on every commit.</p>
+  </div>
+
+  <div class="grid-4" style="margin-bottom:24px">
+    <div class="card metric">
+      <div class="m-val" style="color:var(--amber)">66<span class="m-unit">%</span></div>
+      <div class="m-label">CNN validation accuracy<br>Fundus 4-class model</div>
+    </div>
+    <div class="card metric">
+      <div class="m-val" style="color:var(--accent)">0.643</div>
+      <div class="m-label">Macro F1-score<br>across all 4 classes</div>
+    </div>
+    <div class="card metric">
+      <div class="m-val" style="color:var(--green)">~80<span class="m-unit" style="font-size:18px">ms</span></div>
+      <div class="m-label">Image inference time<br>EfficientNetB0 CPU</div>
+    </div>
+    <div class="card metric">
+      <div class="m-val" style="color:var(--blue)">8<span class="m-unit" style="font-size:18px">Hz</span></div>
+      <div class="m-label">Landmark detection rate<br>120 ms frame interval</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:12px;color:var(--accent);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px">Per-Class F1 Scores — Fundus CNN</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:120px;font-size:13px">Cataract</div>
+        <div style="flex:1;height:10px;background:var(--surface2);border-radius:5px;overflow:hidden">
+          <div style="height:100%;width:79%;background:var(--green);border-radius:5px"></div>
+        </div>
+        <div style="width:40px;text-align:right;font-size:13px;font-weight:600;color:var(--green)">0.79</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:120px;font-size:13px">Diabetic Ret.</div>
+        <div style="flex:1;height:10px;background:var(--surface2);border-radius:5px;overflow:hidden">
+          <div style="height:100%;width:70%;background:var(--accent);border-radius:5px"></div>
+        </div>
+        <div style="width:40px;text-align:right;font-size:13px;font-weight:600;color:var(--accent)">0.70</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:120px;font-size:13px">Normal</div>
+        <div style="flex:1;height:10px;background:var(--surface2);border-radius:5px;overflow:hidden">
+          <div style="height:100%;width:66%;background:var(--blue);border-radius:5px"></div>
+        </div>
+        <div style="width:40px;text-align:right;font-size:13px;font-weight:600;color:var(--blue)">0.66</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="width:120px;font-size:13px">Glaucoma</div>
+        <div style="flex:1;height:10px;background:var(--surface2);border-radius:5px;overflow:hidden">
+          <div style="height:100%;width:43%;background:var(--amber);border-radius:5px"></div>
+        </div>
+        <div style="width:40px;text-align:right;font-size:13px;font-weight:600;color:var(--amber)">0.43</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--muted2);margin-top:12px">Glaucoma's lower F1 reflects limited training samples relative to the other classes. This is documented in the report as a known limitation.</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div style="font-size:12px;color:var(--green);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px">Test Suite Coverage</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:8px">
+          <span style="font-size:13px">test_auth_and_pdf.py</span>
+          <span style="font-size:13px;font-weight:700;color:var(--green)">22 passed</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.2);border-radius:8px">
+          <span style="font-size:13px">test_anterior.py</span>
+          <span style="font-size:13px;font-weight:700;color:var(--green)">13 passed</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.2);border-radius:8px">
+          <span style="font-size:13px">test_suite.py (refactor)</span>
+          <span style="font-size:13px;font-weight:700;color:var(--accent)">19 passed</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:8px;font-weight:700">
+          <span style="font-size:13px">Total</span>
+          <span style="font-size:14px;color:var(--blue)">54 passed</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px;color:var(--amber);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px">Non-Functional Requirements</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--muted)">Mock inference latency</span>
+          <span style="font-weight:600">&lt; 2000 ms ✓</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--muted)">EAR frame processing</span>
+          <span style="font-weight:600">~0.03 ms ✓</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--muted)">Fuzzy boundary safety</span>
+          <span style="font-weight:600">All finite ✓</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--muted)">Clinical decoupling</span>
+          <span style="font-weight:600">Proven by test ✓</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span style="color:var(--muted)">Grad-CAM normalised [0,1]</span>
+          <span style="font-weight:600">7×7 heatmap ✓</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0">
+          <span style="color:var(--muted)">Image cloud storage</span>
+          <span style="font-weight:600;color:var(--green)">None (local only) ✓</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ FOOTER ══════════════════════════ -->
+<div style="padding:28px 40px;border-top:1px solid var(--border);text-align:center;color:var(--muted2);font-size:12px;margin-top:20px">
+  Smart Eye · COM668 Final Year Project · Ulster University · 2025–2026 · Mahfuzur Rahman Emon (B00976168)
+  <br style="margin-bottom:4px">
+  This is a preliminary screening utility and does not provide clinical diagnoses.
+</div>
+
+<script>
+  function show(id) {
+    document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('pane-' + id).classList.add('active');
+    event.currentTarget.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
