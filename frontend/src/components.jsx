@@ -744,17 +744,8 @@ export function NavBar({ isMock, theme, onToggleTheme, a11y, onToggleA11y }) {
   const [authOpen, setAuthOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
-
-  // Auto-prompt sign-in only on the very first page load of a new session.
-  // Once the user has seen it (and dismissed, gone guest, or signed in),
-  // we set a sessionStorage flag so navigating back home never re-triggers it.
-  useEffect(() => {
-    if (!isAuthed && !sessionStorage.getItem("se_auth_prompted")) {
-      sessionStorage.setItem("se_auth_prompted", "1");
-      setAuthOpen(true);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // No auto-open modal on load — visitors see the landing page first.
+  // Protected features use the in-page AuthGate; the Sign In button is always visible in the nav.
   const modelPill =
     isMock == null
       ? { cls: "", txt: "…" }
