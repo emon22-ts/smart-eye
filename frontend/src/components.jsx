@@ -745,9 +745,14 @@ export function NavBar({ isMock, theme, onToggleTheme, a11y, onToggleA11y }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
 
-  // Prompt for sign-in / guest on first load when neither has been chosen.
+  // Auto-prompt sign-in only on the very first page load of a new session.
+  // Once the user has seen it (and dismissed, gone guest, or signed in),
+  // we set a sessionStorage flag so navigating back home never re-triggers it.
   useEffect(() => {
-    if (!isAuthed) setAuthOpen(true);
+    if (!isAuthed && !sessionStorage.getItem("se_auth_prompted")) {
+      sessionStorage.setItem("se_auth_prompted", "1");
+      setAuthOpen(true);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const modelPill =

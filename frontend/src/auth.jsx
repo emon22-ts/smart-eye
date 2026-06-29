@@ -94,10 +94,13 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem("se_token");
     localStorage.removeItem("se_guest");
+    // Clear the "already prompted" flag so the next fresh login cycle
+    // will show the auth modal again on home if the user comes back.
+    sessionStorage.removeItem("se_auth_prompted");
     setToken(null);
     setUser(null);
     setIsGuest(false);
-    navigate("/login", { replace: true });
+    navigate("/", { replace: true });
   };
 
   const value = {
