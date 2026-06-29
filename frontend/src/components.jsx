@@ -425,27 +425,28 @@ export function NotificationsBell({ isMock }) {
 }
 
 export function UserMenu({ onSignIn }) {
-  const { user, logout } = useAuth();
+  const { user, isGuest, logout } = useAuth();
   const { t } = useT();
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
   const ref = useDismiss(open, setOpen);
   const signedIn = !!user;
+  // Guest shows "G" avatar and "Guest" label; signed-in shows real initial/name
   const label = user?.name || user?.email || "Guest";
   const initial = (label[0] || "G").toUpperCase();
   return (
     <div className="nav-pop" ref={ref}>
       <button className="user-btn" onClick={() => setOpen(!open)} aria-label="Account">
-        <span className="avatar">{initial}</span>
+        <span className={`avatar${isGuest && !signedIn ? " guest-avatar" : ""}`}>{initial}</span>
         <span className="user-name">{signedIn ? label : "Guest"}</span>
       </button>
       {open && (
         <div className="pop-panel pop-right">
           <div className="pop-user">
-            <span className="avatar lg">{initial}</span>
+            <span className={`avatar lg${isGuest && !signedIn ? " guest-avatar" : ""}`}>{initial}</span>
             <div>
               <b>{signedIn ? label : "Guest session"}</b>
-              <span>{signedIn ? user?.email : "Not signed in"}</span>
+              <span>{signedIn ? user?.email : "Screenings not saved to history"}</span>
             </div>
           </div>
           {signedIn && (
@@ -453,11 +454,18 @@ export function UserMenu({ onSignIn }) {
               {t("profile.menuLink")}
             </button>
           )}
+          {/* Sign in option shown to guests so they can upgrade their session */}
+          {!signedIn && (
+            <button className="pop-action" onClick={() => { setOpen(false); onSignIn && onSignIn(); }}>
+              {t("nav.signIn")} / Register
+            </button>
+          )}
+          {/* Sign out always available — for both real users and guests */}
           <button
-            className="pop-action"
-            onClick={() => { setOpen(false); if (signedIn) { logout(); } else { onSignIn && onSignIn(); } }}
+            className="pop-action pop-action-danger"
+            onClick={() => { setOpen(false); logout(); }}
           >
-            {signedIn ? t("nav.signOut") : "Sign in / Register"}
+            {signedIn ? t("nav.signOut") : "Exit guest session"}
           </button>
         </div>
       )}
@@ -785,8 +793,8 @@ export function NavBar({ isMock, theme, onToggleTheme, a11y, onToggleA11y }) {
           <button className="lang-switch" onClick={() => setLang(lang === "en" ? "bn" : "en")} aria-label="Switch language" title="Switch language">
             {(LANGS.find((l) => l.code !== lang) || LANGS[0]).label}
           </button>
-          {!user && <button className="se-signin" onClick={() => setAuthOpen(true)}>{t("nav.signIn")}</button>}
-          {user && <UserMenu onSignIn={() => setAuthOpen(true)} />}
+          {!user && !isAuthed && <button className="se-signin" onClick={() => setAuthOpen(true)}>{t("nav.signIn")}</button>}
+          {isAuthed && <UserMenu onSignIn={() => setAuthOpen(true)} />}
         </div>
         <button
           className="nav-burger"
@@ -832,9 +840,9 @@ export function NavBar({ isMock, theme, onToggleTheme, a11y, onToggleA11y }) {
             <span className={`pill pill-sm ${modelPill.cls}`}>
               <span className="dot" />{modelPill.txt}
             </span>
-            {user ? (
+            {isAuthed ? (
               <button className="se-signin" onClick={() => { logout(); closeMenu(); }}>
-                {t("nav.signOut")}
+                {user ? t("nav.signOut") : "Exit guest session"}
               </button>
             ) : (
               <button className="se-signin" onClick={() => { setAuthOpen(true); closeMenu(); }}>

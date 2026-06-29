@@ -611,6 +611,12 @@ export const STYLES = `
 .auth-close-btn{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;border:1px solid var(--border-2);background:var(--card-2);color:var(--muted);display:grid;place-items:center;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
 .auth-close-btn:hover{background:var(--border);color:var(--fg);border-color:var(--border)}
 .auth-back-home{margin-top:18px;text-align:center;padding-top:14px;border-top:1px solid var(--border)}
+/* guest avatar: muted slate instead of accent blue so it's visually distinct from a real account */
+.avatar.guest-avatar{background:rgba(100,116,139,.35);color:var(--muted)}
+.avatar.guest-avatar.lg{background:rgba(100,116,139,.25)}
+/* danger action (exit guest / sign out) subtle red tint on hover */
+.pop-action-danger{color:#f87171!important}
+.pop-action-danger:hover{background:rgba(239,68,68,.08)!important;color:#ef4444!important}
 
 /* =====================================================================
    Light theme
