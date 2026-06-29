@@ -1,7 +1,7 @@
 // Login / register entry. Offers email-password auth, Google sign-in (when the
 // server is configured for it), and a one-click guest mode that needs no account.
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
 import { getHealth } from "../api";
 import { EyeLogo } from "../components";
@@ -15,6 +15,7 @@ const GOOGLE_ERROR_KEYS = {
 export default function Login() {
   const { login, register, loginWithGoogle, continueAsGuest } = useAuth();
   const { t } = useT();
+  const nav = useNavigate();
   const [params] = useSearchParams();
   const [mode, setMode] = useState("login"); // login | register
   const [email, setEmail] = useState("");
@@ -49,6 +50,20 @@ export default function Login() {
   return (
     <main className="auth-wrap">
       <div className="auth-card">
+
+        {/* ── Close / back button — top-right of card ── */}
+        <button
+          type="button"
+          className="auth-close-btn"
+          onClick={() => nav("/")}
+          aria-label="Back to home"
+          title="Back to home"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+
         <div className="auth-brand">
           <div className="logo"><EyeLogo /></div>
           <div><b>SMART EYE</b><span className="tag">{t("auth.brandSub")}</span></div>
@@ -117,6 +132,14 @@ export default function Login() {
           </button>
           <p className="muted small auth-note">{t("auth.guestNote")}</p>
         </div>
+
+        {/* ── Escape hatch — signed-out users coming from within the app ── */}
+        <p className="auth-back-home">
+          <button type="button" className="link-btn" onClick={() => nav("/")}>
+            ← {t("auth.backHome")}
+          </button>
+        </p>
+
       </div>
 
       <p className="auth-disc">

@@ -466,3 +466,9 @@ async def export_session_pdf(
         filename=f"smart_eye_report_{session_id}.pdf",
         background=BackgroundTask(cleanup),
     )
+
+# --------------------------------------------------------------------------- #
+# Anterior-segment workflow (parallel vision module) — mounted as a router.
+# --------------------------------------------------------------------------- #
+from .anterior_api import router as anterior_router  # noqa: E402
+app.include_router(anterior_router)

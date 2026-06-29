@@ -30,6 +30,9 @@ def band_from_ohi(ohi: float) -> Tuple[str, str]:
 _URGENT_CLASSES = {
     "Glaucoma",
     "Diabetic_Retinopathy",
+    # Anterior-segment additions (sight-threatening / warrant specialist review):
+    "Keratitis",
+    "Corneal_Scar",
 }
 
 

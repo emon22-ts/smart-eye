@@ -110,3 +110,18 @@ DISCLAIMER = (
     "NOT provide a clinical diagnosis. Final medical conclusions remain "
     "entirely the responsibility of qualified healthcare professionals."
 )
+
+# --------------------------------------------------------------------------- #
+# Anterior-segment screening (second, parallel vision workflow)
+# --------------------------------------------------------------------------- #
+# Canonical label order for the EfficientNetB0 anterior classifier: output
+# index i maps to ANTERIOR_CLASSES[i]. Keep in sync with train_anterior.py.
+ANTERIOR_CLASSES: Tuple[str, ...] = (
+    "Normal",
+    "Cataract",
+    "Keratitis",
+    "Corneal_Scar",
+)
+
+# EfficientNetB0 native input size (kept separate from the fundus CNN size).
+ANTERIOR_INPUT_SIZE: Tuple[int, int] = (224, 224)

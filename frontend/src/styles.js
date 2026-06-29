@@ -583,7 +583,7 @@ export const STYLES = `
 
 /* Login / register page */
 .auth-wrap{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:18px}
-.auth-card{width:100%;max-width:420px;background:linear-gradient(180deg,rgba(17,24,39,.85),rgba(14,22,38,.8));border:1px solid var(--border);border-radius:20px;padding:30px;box-shadow:0 30px 70px rgba(0,0,0,.4)}
+.auth-card{width:100%;max-width:420px;background:linear-gradient(180deg,rgba(17,24,39,.85),rgba(14,22,38,.8));border:1px solid var(--border);border-radius:20px;padding:30px;box-shadow:0 30px 70px rgba(0,0,0,.4);position:relative}
 .auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
 .auth-brand .logo{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,#3B82F6,#06B6D4);box-shadow:0 6px 18px rgba(59,130,246,.4)}
 .auth-brand .logo svg{width:21px;height:21px}
@@ -608,6 +608,9 @@ export const STYLES = `
 .auth-guest{margin-top:18px;padding-top:18px;border-top:1px solid var(--border)}
 .auth-note{margin-top:9px;text-align:center;line-height:1.5}
 .auth-disc{font-size:11.5px;color:var(--muted-2);max-width:420px;text-align:center;line-height:1.5}
+.auth-close-btn{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;border:1px solid var(--border-2);background:var(--card-2);color:var(--muted);display:grid;place-items:center;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.auth-close-btn:hover{background:var(--border);color:var(--fg);border-color:var(--border)}
+.auth-back-home{margin-top:18px;text-align:center;padding-top:14px;border-top:1px solid var(--border)}
 
 /* =====================================================================
    Light theme
