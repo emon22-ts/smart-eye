@@ -1,0 +1,12 @@
+{
+  "accuracy": 0.8858954041204438,
+  "class_names": [
+    "Cataract",
+    "Diabetic_Retinopathy",
+    "Glaucoma",
+    "Normal"
+  ],
+  "phase1_best": 0.8748018741607666,
+  "phase2_best": 0.8858954310417175,
+  "target_90_met": false
+}
