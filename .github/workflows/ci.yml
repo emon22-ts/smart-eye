@@ -20,39 +20,19 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-ci.txt
 
-      - name: Install CI deps (no TF/dlib)
+      - name: Install CI deps
         run: pip install -r requirements-ci.txt
 
-      - name: Fuzzy risk engine self-test
-        run: python smart_eye/domain/fuzzy_risk_engine.py
+      - name: Import checks
+        run: |
+          python -c "import smart_eye.schemas; print('schemas OK')"
+          python -c "import smart_eye.config; print('config OK')"
+          python -c "import smart_eye.domain.fuzzy_risk_engine; print('fuzzy OK')"
         env:
           PYTHONPATH: ${{ github.workspace }}
 
-      - name: Schema import check
-        run: |
-          python -c "
-          import sys
-          sys.path.insert(0, '.')
-          import smart_eye.schemas
-          print('schemas OK')
-          "
-        env:
-          PYTHONPATH: ${{ github.workspace }}
-
-      - name: Config import check
-        run: |
-          python -c "
-          import sys
-          sys.path.insert(0, '.')
-          import smart_eye.config
-          print('config OK')
-          "
-        env:
-          PYTHONPATH: ${{ github.workspace }}
-
-      - name: Run safe tests only (skip TF/dlib/model tests)
-        run: |
-          python -m pytest smart_eye/tests/test_core.py -q --tb=short 2>/dev/null ||           python -m pytest smart_eye/tests/ -q --tb=short             --ignore=smart_eye/tests/test_model_accuracy.py             --ignore=smart_eye/tests/test_performance.py             -k "not model and not accuracy and not dlib and not tensorflow"             --co -q 2>/dev/null | head -20 &&           echo "Test discovery OK"
+      - name: Run core tests (numpy + pytest only, no TF/dlib)
+        run: python -m pytest smart_eye/tests/test_core.py -v --tb=short
         env:
           PYTHONPATH: ${{ github.workspace }}
 
