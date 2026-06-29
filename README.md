@@ -452,3 +452,20 @@ Measured on Apple Silicon (M-series), macOS arm64, Python 3.9.6, TensorFlow 2.13
 ## Disclaimer
 
 Smart Eye is a preliminary screening and triage support utility. It does NOT provide a clinical diagnosis. Final medical conclusions remain entirely the responsibility of qualified healthcare professionals.
+
+---
+
+## Datasets
+
+### Fundus model (posterior-segment)
+- **Dataset:** Eye Diseases Classification — Guna Venkat Doddi
+- **Source:** https://www.kaggle.com/datasets/gunavenkatdoddi/eye-diseases-classification
+- **Classes:** Normal, Cataract, Glaucoma, Diabetic\_Retinopathy (~1,000 images per class, 4,217 total)
+- **Place images in:** `dataset/train/<class>/` and `dataset/validation/<class>/`
+
+### Anterior-segment model
+- **Dataset:** Assembled from publicly available slit-lamp and anterior segment image sources
+- **Classes:** Normal, Cataract, Keratitis, Corneal\_Scar
+- **Place images in:** `dataset_anterior/train/<class>/` and `dataset_anterior/validation/<class>/`
+
+> **Note:** Datasets are not included in this repository due to size. Download them separately and place them in the correct folders before running the training scripts.
