@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "smart_eye/orchestration/api.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "smart_eye/orchestration/api.py"
+    }
+  ]
+}
