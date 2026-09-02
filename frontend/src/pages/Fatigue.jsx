@@ -2,7 +2,8 @@
 // Only the 12 eye-landmark COORDINATES are POSTed to /api/fatigue/frame; the raw
 // video never leaves the device. The server computes EAR, blink rate, drowsiness.
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FaceMesh } from "@mediapipe/face_mesh";
+import * as FaceMeshLib from "@mediapipe/face_mesh";
+const FaceMesh = FaceMeshLib.FaceMesh || FaceMeshLib.default?.FaceMesh || FaceMeshLib.default;
 import { postFatigueFrame } from "../api";
 import { FRAME_INTERVAL_MS, SPARK_LEN, EAR_THRESHOLD, fmtTime } from "../constants";
 import { IrisVisual, Met, Sparkline } from "../components";
