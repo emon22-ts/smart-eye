@@ -2,7 +2,7 @@
 // API_BASE="" => same-origin requests, forwarded by the Vite dev proxy
 // (vite.config.js -> http://localhost:8000). Set to a full origin for a
 // proxy-less production build (the backend CORS list must then include it).
-export const API_BASE = "";
+export const API_BASE = import.meta.env.VITE_API_BASE || "";
 
 // Attach the stored bearer token (if signed in) so session data is user-scoped.
 // Guests have no token -> requests are anonymous, exactly as before.
