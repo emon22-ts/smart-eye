@@ -62,7 +62,7 @@ export default function Fatigue() {
       try {
         setCamStatus("loading-models");
         const mesh = new FaceMesh({
-          locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`,
+          locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/${f}`,
         });
         mesh.setOptions({
           maxNumFaces: 1,
