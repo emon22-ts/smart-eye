@@ -1,5 +1,6 @@
 {
-  "rewrites": [
-    { "source": "/((?!assets|static|favicon|robots|sitemap).*)", "destination": "/index.html" }
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
